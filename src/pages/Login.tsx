@@ -75,8 +75,7 @@ const LoginPage = () => {
       //const data = await res.json();
 
       const data = await postLoginGoogle(id_token);
-      console.log("data", data);
-      if (data?.status === 200) {
+      if (data.status === 200) {
         console.log("🎉 Đăng nhập thành công:", data);
         alert("Đăng nhập thành công!");
       } else {
