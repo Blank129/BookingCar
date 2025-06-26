@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { postRoute } from '../service/api';
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -51,10 +52,10 @@ interface MapViewProps {
 
 export default function MapView({ pickup, destination, className = '' }: MapViewProps) {
   const mapRef = useRef<L.Map>(null);
-
-  // Default center (Ho Chi Minh City)
   const defaultCenter: [number, number] = [10.7769, 106.7009];
   const defaultZoom = 13;
+
+  const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
 
   useEffect(() => {
     if (mapRef.current && pickup && destination) {
@@ -68,9 +69,25 @@ export default function MapView({ pickup, destination, className = '' }: MapView
     }
   }, [pickup, destination]);
 
-  const routeCoordinates: [number, number][] = pickup && destination 
-    ? [pickup.coordinates, destination.coordinates]
-    : [];
+  useEffect(() => {
+    const getRoute = async () => {
+      if (pickup && destination) {
+        try {
+          const coords = await postRoute(
+            pickup.coordinates,
+            destination.coordinates
+          );
+          setRouteCoords(coords);
+        } catch (error) {
+          setRouteCoords([]);
+        }
+      } else {
+        setRouteCoords([]);
+      }
+    };
+
+    getRoute();
+  }, [pickup, destination]);
 
   return (
     <div className={`relative ${className}`}>
@@ -84,7 +101,7 @@ export default function MapView({ pickup, destination, className = '' }: MapView
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
         {pickup && (
           <Marker position={pickup.coordinates} icon={pickupIcon}>
             <Popup>
@@ -96,7 +113,7 @@ export default function MapView({ pickup, destination, className = '' }: MapView
             </Popup>
           </Marker>
         )}
-        
+
         {destination && (
           <Marker position={destination.coordinates} icon={destinationIcon}>
             <Popup>
@@ -108,14 +125,13 @@ export default function MapView({ pickup, destination, className = '' }: MapView
             </Popup>
           </Marker>
         )}
-        
-        {routeCoordinates.length === 2 && (
+
+        {routeCoords.length > 0 && (
           <Polyline
-            positions={routeCoordinates}
+            positions={routeCoords}
             color="#3B82F6"
             weight={4}
-            opacity={0.8}
-            dashArray="10, 10"
+            opacity={0.9}
           />
         )}
       </MapContainer>
