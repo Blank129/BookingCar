@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { postLoginGoogle } from "../service/api";
 declare global {
   interface Window {
     google: any;
@@ -34,7 +35,7 @@ const LoginPage = () => {
       [e.target.name]: e.target.value,
     });
   };
-    useEffect(() => {
+  useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
@@ -49,7 +50,6 @@ const LoginPage = () => {
   }, []);
 
   const handleCredentialResponse = async (response: any) => {
-    console.log("📨 response từ Google:", response);
     const id_token = response?.credential;
 
     if (!id_token) {
@@ -63,16 +63,20 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id_token }),
-      });
+      // const res = await fetch("http://localhost:5000/api/auth/google", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ id_token }),
+      // });
 
-      const data = await res.json();
-      if (res.ok) {
+
+      //const data = await res.json();
+
+      const data = await postLoginGoogle(id_token);
+      console.log("data", data);
+      if (data?.status === 200) {
         console.log("🎉 Đăng nhập thành công:", data);
         alert("Đăng nhập thành công!");
       } else {
@@ -86,7 +90,7 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (
@@ -111,11 +115,7 @@ const LoginPage = () => {
   const handleGoogleLogin = () => {
     console.log("🔘 Bắt đầu đăng nhập với Google");
 
-    if (
-      window.google &&
-      window.google.accounts &&
-      window.google.accounts.id
-    ) {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
       window.google.accounts.id.prompt();
     } else {
       console.warn("⚠️ Google chưa sẵn sàng");

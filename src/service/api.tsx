@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosApiInstance from "./axios";
 
 export const postRoute = async (
@@ -10,6 +11,39 @@ export const postRoute = async (
       destination,
     });
     return response.data.coordinates;
+  } catch (error) {
+    console.log("lỗi postRouter", error);
+    return error;
+  }
+};
+
+export const getLocationData = async (query: string, signal?: AbortSignal) => {
+  const response = await axios.get(
+    "https://nominatim.openstreetmap.org/search",
+    {
+      params: {
+        q: query,
+        format: "json",
+        addressdetails: 1,
+        limit: 8,
+        countrycodes: "vn",
+      },
+      headers: {
+        "Accept-Language": "vi",
+      },
+      signal,
+    }
+  );
+
+  return response.data;
+};
+
+export const postLoginGoogle = async (id_token: string) => {
+  try {
+    const response: any = await axiosApiInstance.post(`/auth/google`, {
+      id_token,
+    });
+    return response.data;
   } catch (error) {
     console.log("lỗi postRouter", error);
     return error;

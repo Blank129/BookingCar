@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Clock, X, Loader } from 'lucide-react';
+import { getLocationData } from '../service/api';
 
 interface Location {
   id: string;
@@ -34,35 +35,24 @@ export default function LocationInput({ value, placeholder, onLocationSelect, ty
 
     const controller = new AbortController();
     const timeout = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&countrycodes=vn`,
-          {
-            headers: {
-              'Accept-Language': 'vi',
-              'User-Agent': 'your-app-name (your@email.com)' // Cập nhật đúng thông tin!
-            },
-            signal: controller.signal
-          }
-        );
+    try {
+      const data = await getLocationData(query, controller.signal);
 
-        const data = await response.json();
+      const locations = data.map((item: any, idx: number) => ({
+        id: item.place_id || `osm-${idx}`,
+        name: item.display_name.split(',')[0],
+        address: item.display_name,
+        coordinates: [parseFloat(item.lat), parseFloat(item.lon)]
+      }));
 
-        const locations: Location[] = data.map((item: any, idx: number) => ({
-          id: item.place_id || `osm-${idx}`,
-          name: item.display_name.split(',')[0],
-          address: item.display_name,
-          coordinates: [parseFloat(item.lat), parseFloat(item.lon)]
-        }));
-
-        setSuggestions(locations);
-        setShowSuggestions(true);
-      } catch (error) {
-        if ((error as any).name !== 'AbortError') {
-          console.error('Lỗi khi tìm kiếm địa điểm:', error);
-        }
+      setSuggestions(locations);
+      setShowSuggestions(true);
+    } catch (error: any) {
+      if (error.name !== 'CanceledError') {
+        console.error('Lỗi khi tìm kiếm địa điểm:', error);
       }
-    }, 400); // debounce
+    }
+  }, 400);
 
     return () => {
       clearTimeout(timeout);
