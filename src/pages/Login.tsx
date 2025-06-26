@@ -10,7 +10,11 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+declare global {
+  interface Window {
+    google: any;
+  }
+}
 const LoginPage = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -44,7 +48,6 @@ const LoginPage = () => {
     document.body.appendChild(script);
   }, []);
 
-  // 👉 Hàm xử lý callback khi Google trả về token
   const handleCredentialResponse = async (response: any) => {
     console.log("📨 response từ Google:", response);
     const id_token = response?.credential;
@@ -83,7 +86,7 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
       if (
@@ -94,7 +97,7 @@ const LoginPage = () => {
         console.log("✅ Google Identity Services đã sẵn sàng");
 
         window.google.accounts.id.initialize({
-          client_id: "577431063812-at1lu33tid83cbpclt08e2qsc86u0kiu.apps.googleusercontent.com",
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleCredentialResponse,
         });
 
@@ -105,7 +108,6 @@ const LoginPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 👉 Khi người dùng bấm nút login
   const handleGoogleLogin = () => {
     console.log("🔘 Bắt đầu đăng nhập với Google");
 

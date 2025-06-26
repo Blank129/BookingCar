@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Navigation } from 'lucide-react';
 
 interface Location {
   id: string;
