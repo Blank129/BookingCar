@@ -123,8 +123,8 @@ function HomePage() {
   };
 
   const handleLogout = () => {
-    console.log("Logging out...");
-    // Thay thế bằng logic logout thực tế
+    localStorage.removeItem("id_token");
+    navigate("/login");
     setIsDropdownOpen(false);
   };
 

@@ -10,7 +10,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { postLoginGoogle } from "../service/api";
 import { AuthContext } from "../context/authContext";
 declare global {
   interface Window {
