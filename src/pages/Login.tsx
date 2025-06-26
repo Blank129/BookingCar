@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { postLoginGoogle } from "../service/api";
+import { AuthContext } from "../context/authContext";
 declare global {
   interface Window {
     google: any;
@@ -18,6 +19,7 @@ declare global {
 }
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { handlePostLoginGoogle } = AuthContext();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -62,32 +64,7 @@ const LoginPage = () => {
     console.log("✅ id_token nhận được:", id_token);
     setIsLoading(true);
 
-    try {
-      // const res = await fetch("http://localhost:5000/api/auth/google", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ id_token }),
-      // });
-
-
-      //const data = await res.json();
-
-      const data = await postLoginGoogle(id_token);
-      if (data.status === 200) {
-        console.log("🎉 Đăng nhập thành công:", data);
-        alert("Đăng nhập thành công!");
-      } else {
-        console.error("❌ Đăng nhập thất bại:", data);
-        alert(data?.error || "Đăng nhập thất bại");
-      }
-    } catch (error) {
-      console.error("❌ Lỗi fetch tới backend:", error);
-      alert("Có lỗi khi gọi backend");
-    } finally {
-      setIsLoading(false);
-    }
+    await handlePostLoginGoogle(id_token);
   };
 
   useEffect(() => {
