@@ -53,6 +53,7 @@ const LoginPage = () => {
 
   const handleCredentialResponse = async (response: any) => {
     const id_token = response?.credential;
+    
 
     if (!id_token) {
       console.error("❌ Không lấy được id_token từ response");
@@ -62,6 +63,7 @@ const LoginPage = () => {
     }
 
     console.log("✅ id_token nhận được:", id_token);
+    localStorage.setItem('id_token', id_token);
     setIsLoading(true);
 
     await handlePostLoginGoogle(id_token);

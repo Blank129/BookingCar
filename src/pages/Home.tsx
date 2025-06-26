@@ -1,11 +1,22 @@
-import { useState } from 'react';
-import { Car, Menu, User, ArrowLeft } from 'lucide-react';
-import VehicleSelector, { Vehicle, vehicleTypes } from '../components/VehicleSelector';
-import MapView from '../components/MapView';
-import LocationInput from '../components/LocationInput';
-import BookingConfirmation from '../components/BookingConfirmation';
-import { useNavigate } from 'react-router-dom';
-
+import { useEffect, useState } from "react";
+import {
+  Car,
+  Menu,
+  User,
+  ArrowLeft,
+  Settings,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
+import VehicleSelector, {
+  Vehicle,
+  vehicleTypes,
+} from "../components/VehicleSelector";
+import MapView from "../components/MapView";
+import LocationInput from "../components/LocationInput";
+import BookingConfirmation from "../components/BookingConfirmation";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/authContext";
 
 interface Location {
   id: string;
@@ -14,40 +25,60 @@ interface Location {
   coordinates: [number, number];
 }
 
-type AppState = 'location' | 'vehicle' | 'booking';
+type AppState = "location" | "vehicle" | "booking";
 
 function HomePage() {
-  const navivgate = useNavigate();
-  const [currentState, setCurrentState] = useState<AppState>('location');
+  const navigate = useNavigate();
+  const { userInfo, handlePostLoginGoogle } = AuthContext();
+  const [currentState, setCurrentState] = useState<AppState>("location");
   const [pickup, setPickup] = useState<Location | null>(null);
   const [destination, setDestination] = useState<Location | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [distance, setDistance] = useState(0);
   const [showMobileMap, setShowMobileMap] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  console.log("User Info ở homePage:", userInfo?.user);
+
+  useEffect(() => {
+    const id_token = localStorage.getItem("id_token");
+    if (id_token) {
+      handlePostLoginGoogle(id_token);
+    }
+  }, []);
 
   // Calculate distance between two coordinates (simplified)
-  const calculateDistance = (coord1: [number, number], coord2: [number, number]) => {
+  const calculateDistance = (
+    coord1: [number, number],
+    coord2: [number, number]
+  ) => {
     const [lat1, lon1] = coord1;
     const [lat2, lon2] = coord2;
-    
+
     const R = 6371; // Earth's radius in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
-    
+
     return Math.max(distance, 1); // Minimum 1km for pricing
   };
 
   const handlePickupSelect = (location: Location) => {
     setPickup(location);
     if (destination) {
-      const dist = calculateDistance(location.coordinates, destination.coordinates);
+      const dist = calculateDistance(
+        location.coordinates,
+        destination.coordinates
+      );
       setDistance(dist);
     }
   };
@@ -66,12 +97,12 @@ function HomePage() {
 
   const handleBookRide = () => {
     if (pickup && destination && selectedVehicle) {
-      setCurrentState('booking');
+      setCurrentState("booking");
     }
   };
 
   const handleCancelBooking = () => {
-    setCurrentState('location');
+    setCurrentState("location");
     setPickup(null);
     setDestination(null);
     setSelectedVehicle(null);
@@ -79,16 +110,27 @@ function HomePage() {
   };
 
   const handleBackToVehicleSelection = () => {
-    setCurrentState('vehicle');
+    setCurrentState("vehicle");
   };
 
   const canProceedToVehicleSelection = pickup && destination && distance > 0;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(price);
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    // Thay thế bằng logic logout thực tế
+    setIsDropdownOpen(false);
+  };
+
+  const handleViewProfile = () => {
+    navigate("/profile");
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -127,8 +169,12 @@ function HomePage() {
                 <Car className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg md:text-xl font-bold text-gray-900">RideBook</h1>
-                <p className="text-xs md:text-sm text-gray-600">Đặt xe nhanh chóng</p>
+                <h1 className="text-lg md:text-xl font-bold text-gray-900">
+                  RideBook
+                </h1>
+                <p className="text-xs md:text-sm text-gray-600">
+                  Đặt xe nhanh chóng
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -142,20 +188,98 @@ function HomePage() {
               <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <Menu className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" onClick={() => navivgate('/login')}>
-                <User className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
-              </button>
+              {userInfo?.user ? (
+                <div className="relative">
+                  {/* Avatar Button */}
+                  <button
+                    className="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  >
+                    <img
+                      src={userInfo.user.avatar}
+                      alt={userInfo.user.name}
+                      className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover border-2 border-gray-200"
+                    />
+                    <ChevronDown
+                      className={`w-3 h-3 text-gray-500 transition-transform ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsDropdownOpen(false)}
+                      />
+
+                      {/* Dropdown Content */}
+                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                        {/* User Info */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={userInfo.user.avatar}
+                              alt={userInfo.user.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {userInfo.user.name}
+                              </p>
+                              <p className="text-sm text-gray-500 truncate">
+                                {userInfo.user.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="py-1">
+                          <button
+                            onClick={handleViewProfile}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                            View Profile
+                          </button>
+
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4 mr-3 text-red-500" />
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <button
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={() => navigate("/login")}
+                >
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
+                </button>
+              )}
             </div>
           </div>
         </header>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          {currentState === 'location' && (
+          {currentState === "location" && (
             <div className="space-y-4 md:space-y-6">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Đặt chuyến đi</h2>
-                
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
+                  Đặt chuyến đi
+                </h2>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -168,7 +292,7 @@ function HomePage() {
                       type="pickup"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Điểm đến
@@ -185,11 +309,15 @@ function HomePage() {
                 {canProceedToVehicleSelection && (
                   <div className="mt-4 md:mt-6 p-4 bg-blue-50 rounded-lg">
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm text-gray-600">Quãng đường dự kiến:</span>
-                      <span className="font-semibold text-gray-900">{distance.toFixed(1)} km</span>
+                      <span className="text-sm text-gray-600">
+                        Quãng đường dự kiến:
+                      </span>
+                      <span className="font-semibold text-gray-900">
+                        {distance.toFixed(1)} km
+                      </span>
                     </div>
                     <button
-                      onClick={() => setCurrentState('vehicle')}
+                      onClick={() => setCurrentState("vehicle")}
                       className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
                     >
                       Chọn loại xe
@@ -200,12 +328,14 @@ function HomePage() {
             </div>
           )}
 
-          {currentState === 'vehicle' && pickup && destination && (
+          {currentState === "vehicle" && pickup && destination && (
             <div className="space-y-4 md:space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">Chọn loại xe</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  Chọn loại xe
+                </h2>
                 <button
-                  onClick={() => setCurrentState('location')}
+                  onClick={() => setCurrentState("location")}
                   className="text-blue-600 hover:text-blue-700 font-medium text-sm md:text-base"
                 >
                   Chỉnh sửa
@@ -215,11 +345,15 @@ function HomePage() {
               <div className="bg-gray-50 rounded-lg p-3 md:p-4 space-y-2">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-900 truncate">{pickup.name}</span>
+                  <span className="text-sm font-medium text-gray-900 truncate">
+                    {pickup.name}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-900 truncate">{destination.name}</span>
+                  <span className="text-sm font-medium text-gray-900 truncate">
+                    {destination.name}
+                  </span>
                 </div>
               </div>
 
@@ -236,7 +370,9 @@ function HomePage() {
                     <div>
                       <p className="text-gray-600 text-sm">Tổng chi phí</p>
                       <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                        {formatPrice(Math.ceil(distance * selectedVehicle.pricePerKm))}
+                        {formatPrice(
+                          Math.ceil(distance * selectedVehicle.pricePerKm)
+                        )}
                       </p>
                     </div>
                   </div>
@@ -251,17 +387,20 @@ function HomePage() {
             </div>
           )}
 
-          {currentState === 'booking' && pickup && destination && selectedVehicle && (
-            <BookingConfirmation
-              pickup={pickup}
-              destination={destination}
-              vehicle={selectedVehicle}
-              price={Math.ceil(distance * selectedVehicle.pricePerKm)}
-              distance={distance}
-              onCancel={handleCancelBooking}
-              onBack={handleBackToVehicleSelection}
-            />
-          )}
+          {currentState === "booking" &&
+            pickup &&
+            destination &&
+            selectedVehicle && (
+              <BookingConfirmation
+                pickup={pickup}
+                destination={destination}
+                vehicle={selectedVehicle}
+                price={Math.ceil(distance * selectedVehicle.pricePerKm)}
+                distance={distance}
+                onCancel={handleCancelBooking}
+                onBack={handleBackToVehicleSelection}
+              />
+            )}
         </div>
       </div>
 
