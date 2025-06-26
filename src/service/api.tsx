@@ -43,7 +43,7 @@ export const postLoginGoogle = async (id_token: string) => {
     const response: any = await axiosApiInstance.post(`/auth/google`, {
       id_token,
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.log("lỗi postRouter", error);
     return error;
