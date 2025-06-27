@@ -6,7 +6,7 @@ export const postRoute = async (
   destination: [number, number]
 ) => {
   try {
-    const response: any = await axiosApiInstance.post(`/route`, {
+    const response: any = await axiosApiInstance.post(`/route/map`, {
       pickup,
       destination,
     });
@@ -49,3 +49,41 @@ export const postLoginGoogle = async (id_token: string) => {
     return error;
   }
 };
+
+export const postRegisterWeb = async (name: any, phone: any, email: any, password: any) => {
+  try {
+    const response: any = await axiosApiInstance.post(`/auth/register`, {
+      name, phone, email, password
+    });
+    return response;
+  } catch (error) {
+    console.log("lỗi postRegisterWeb", error);
+    return error;
+  }
+};
+
+export const postLoginWeb = async (email: any, password: any) => {
+  try {
+    const response: any = await axiosApiInstance.post(`/auth/login`, {
+       email, password
+    });
+    return response;
+  } catch (error: any) {
+    console.log("lỗi postLoginWeb", error.response.data.error);
+    return error.response.data.error;
+  }
+};
+
+export const postDecodeToken = async (token: any) => {
+  try {
+    const response: any = await axiosApiInstance.post(`/auth/decode`, {
+       token
+    });
+    return response;
+  } catch (error) {
+    console.log("lỗi decode", error);
+    return error;
+  }
+};
+
+

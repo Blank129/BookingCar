@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
+import { postLoginWeb, postRegisterWeb } from "../service/api";
 declare global {
   interface Window {
     google: any;
@@ -18,7 +19,8 @@ declare global {
 }
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { handlePostLoginGoogle } = AuthContext();
+  const { handlePostLoginGoogle, handlePostLoginWeb, handlePostRegisterWeb } =
+    AuthContext();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -41,28 +43,24 @@ const LoginPage = () => {
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
-    script.onload = () => {
-      
-    };
+    script.onload = () => {};
     script.onerror = () => {
-      console.error("❌ Không thể load script Google");
+      console.error("Không thể load script Google");
     };
     document.body.appendChild(script);
   }, []);
 
   const handleCredentialResponse = async (response: any) => {
     const id_token = response?.credential;
-    
 
     if (!id_token) {
-      console.error("❌ Không lấy được id_token từ response");
+      console.error("Không lấy được id_token từ response");
       alert("Đăng nhập Google thất bại: không có token");
       setIsLoading(false);
       return;
     }
 
-    console.log("✅ id_token nhận được:", id_token);
-    localStorage.setItem('id_token', id_token);
+    localStorage.setItem("id_token", id_token);
     setIsLoading(true);
 
     await handlePostLoginGoogle(id_token);
@@ -93,22 +91,39 @@ const LoginPage = () => {
     if (window.google && window.google.accounts && window.google.accounts.id) {
       window.google.accounts.id.prompt();
     } else {
-      console.warn("⚠️ Google chưa sẵn sàng");
+      console.warn("Google chưa sẵn sàng");
       alert("Google chưa sẵn sàng. Vui lòng chờ hoặc thử lại sau.");
     }
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setIsLoading(true); 
+
+    try {
       if (isLogin) {
-        alert("Đăng nhập thành công! (Demo)");
+        await handlePostLoginWeb(formData.email, formData.password);
       } else {
-        alert("Đăng ký thành công! (Demo)");
+        await handlePostRegisterWeb(
+          formData.name,
+          formData.phone,
+          formData.email,
+          formData.password
+        );
+        setIsLogin(true);
+        setFormData({
+          email: "",
+          password: "",
+          name: "",
+          phone: "",
+          confirmPassword: "",
+        });
       }
-    }, 1500);
+    } catch (error) {
+      console.error(isLogin ? "Lỗi đăng nhập:" : "Lỗi đăng ký:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleAuthMode = () => {
