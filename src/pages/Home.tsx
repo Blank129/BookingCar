@@ -29,7 +29,7 @@ type AppState = "location" | "vehicle" | "booking";
 
 function HomePage() {
   const navigate = useNavigate();
-  const { userInfo, handlePostLoginGoogle } = AuthContext();
+  const { userInfo, setUserInfo, handlePostLoginGoogle } = AuthContext();
   const [currentState, setCurrentState] = useState<AppState>("location");
   const [pickup, setPickup] = useState<Location | null>(null);
   const [destination, setDestination] = useState<Location | null>(null);
@@ -44,9 +44,10 @@ function HomePage() {
     const id_token = localStorage.getItem("id_token");
     if (id_token) {
       handlePostLoginGoogle(id_token);
+    } else {
+      setUserInfo(null);
     }
-    console.log("User Info ở useEffect:");
-  }, [userInfo]);
+  }, []);
 
   // Calculate distance between two coordinates (simplified)
   const calculateDistance = (

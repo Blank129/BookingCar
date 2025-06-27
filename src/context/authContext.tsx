@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
     userInfo: any;
+    setUserInfo: any;
     handlePostLoginGoogle: any;
 };
 
@@ -35,7 +36,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  return <AuthContexts.Provider value={{ userInfo, handlePostLoginGoogle }}>{children}</AuthContexts.Provider>;
+  return <AuthContexts.Provider value={{ userInfo, setUserInfo, handlePostLoginGoogle }}>{children}</AuthContexts.Provider>;
 };
 
 // Hook tiện lợi để dùng context
