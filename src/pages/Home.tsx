@@ -17,6 +17,7 @@ import LocationInput from "../components/LocationInput";
 import BookingConfirmation from "../components/BookingConfirmation";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
+import { getRouteDistance } from "../service/api";
 
 interface Location {
   id: string;
@@ -62,49 +63,27 @@ function HomePage() {
     }
   }, []);
 
-  // Calculate distance between two coordinates (simplified)
-  const calculateDistance = (
-    coord1: [number, number],
-    coord2: [number, number]
-  ) => {
-    const [lat1, lon1] = coord1;
-    const [lat2, lon2] = coord2;
+  const handlePickupSelect = async (location: Location) => {
+  setPickup(location);
+  if (destination) {
+    const dist = await getRouteDistance(
+      location.coordinates,
+      destination.coordinates
+    );
+    setDistance(dist);
+  }
+};
 
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c;
-
-    return Math.max(distance, 1); // Minimum 1km for pricing
-  };
-
-  const handlePickupSelect = (location: Location) => {
-    setPickup(location);
-    if (destination) {
-      const dist = calculateDistance(
-        location.coordinates,
-        destination.coordinates
-      );
-      setDistance(dist);
-    }
-  };
-
-  const handleDestinationSelect = (location: Location) => {
-    setDestination(location);
-    if (pickup) {
-      const dist = calculateDistance(pickup.coordinates, location.coordinates);
-      setDistance(dist);
-    }
-  };
+const handleDestinationSelect = async (location: Location) => {
+  setDestination(location);
+  if (pickup) {
+    const dist = await getRouteDistance(
+      pickup.coordinates,
+      location.coordinates
+    );
+    setDistance(dist);
+  }
+};
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -148,6 +127,7 @@ function HomePage() {
     navigate("/profile");
     setIsDropdownOpen(false);
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -187,7 +167,7 @@ function HomePage() {
                 </div>
                 <div>
                   <h1 className="text-lg md:text-xl font-bold text-gray-900">
-                    RideBook
+                    VNCar Booking
                   </h1>
                   <p className="text-xs md:text-sm text-gray-600">
                     Đặt xe nhanh chóng

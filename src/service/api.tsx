@@ -1,22 +1,6 @@
 import axios from "axios";
 import axiosApiInstance from "./axios";
 
-export const postRoute = async (
-  pickup: [number, number],
-  destination: [number, number]
-) => {
-  try {
-    const response: any = await axiosApiInstance.post(`/route/map`, {
-      pickup,
-      destination,
-    });
-    return response.data.coordinates;
-  } catch (error) {
-    console.log("lỗi postRouter", error);
-    return error;
-  }
-};
-
 export const getLocationData = async (query: string, signal?: AbortSignal) => {
   const response = await axios.get(
     "https://nominatim.openstreetmap.org/search",
@@ -86,4 +70,34 @@ export const postDecodeToken = async (token: any) => {
   }
 };
 
+export const postRoute = async (
+  pickup: [number, number],
+  destination: [number, number]
+) => {
+  try {
+    const response: any = await axiosApiInstance.post(`/route/path`, {
+      pickup,
+      destination,
+    });
+    return response.data.coordinates;
+  } catch (error) {
+    console.log("lỗi postRouter", error);
+    return error;
+  }
+};
+
+export const getRouteDistance = async (start: [number, number], end: [number, number]
+): Promise<number> => {
+  try {
+    const res = await axiosApiInstance.post("/route/distance", {
+      start,
+      end,
+    });
+
+    return res.data.distanceKm;
+  } catch (error) {
+    console.error("Lỗi khi gọi backend ORS:", error);
+    return 1;
+  }
+};
 

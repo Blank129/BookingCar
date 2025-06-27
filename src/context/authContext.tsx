@@ -41,7 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const res = await postLoginWeb(email, password);
       if (res.status === 200) {
-        console.log("res", res.data);
         localStorage.setItem("userInfoWeb", res.data.token);
         navigate("/");
       } else {
@@ -74,7 +73,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const res = await postDecodeToken(token);
       if(res.status === 200) {
-        console.log("res", res.data)
         setUserInfo(res.data);
       }
     } catch (error) {
