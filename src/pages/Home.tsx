@@ -45,7 +45,8 @@ function HomePage() {
     if (id_token) {
       handlePostLoginGoogle(id_token);
     }
-  }, []);
+    console.log("User Info ở useEffect:");
+  }, [userInfo]);
 
   // Calculate distance between two coordinates (simplified)
   const calculateDistance = (

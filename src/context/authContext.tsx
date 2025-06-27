@@ -22,7 +22,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (data.status === 200) {
         console.log("🎉 Đăng nhập thành công:", data);
         setUserInfo(data.data);
-        alert("Đăng nhập thành công!");
         navigate("/");
       } else {
         console.error("❌ Đăng nhập thất bại:", data);

@@ -42,7 +42,7 @@ const LoginPage = () => {
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      console.log("✅ Script Google Identity Services đã load");
+      
     };
     script.onerror = () => {
       console.error("❌ Không thể load script Google");
@@ -75,8 +75,6 @@ const LoginPage = () => {
         window.google.accounts &&
         window.google.accounts.id
       ) {
-        console.log("✅ Google Identity Services đã sẵn sàng");
-
         window.google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleCredentialResponse,
