@@ -102,13 +102,14 @@ const LoginPage = () => {
 
     try {
       if (isLogin) {
-        await handlePostLoginWeb(formData.email, formData.password);
+        await handlePostLoginWeb(formData.email, formData.password, 'user');
       } else {
         await handlePostRegisterWeb(
           formData.name,
           formData.phone,
           formData.email,
-          formData.password
+          formData.password,
+          'user'
         );
         setIsLogin(true);
         setFormData({
@@ -369,6 +370,16 @@ const LoginPage = () => {
                 {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
               </button>
             </p>
+          </div>
+
+          {/* Driver login link */}
+          <div className="text-center mt-4">
+            <button
+              onClick={() => navigate('/driver/login')}
+              className="text-green-500 hover:text-green-600 text-sm font-medium"
+            >
+              Đăng nhập với tài khoản tài xế
+            </button>
           </div>
 
           {/* Terms */}

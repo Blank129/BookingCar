@@ -34,11 +34,28 @@ export const postLoginGoogle = async (id_token: string) => {
   }
 };
 
-export const postRegisterWeb = async (name: any, phone: any, email: any, password: any) => {
+export const postRegisterWeb = async (
+  name: any, 
+  phone: any, 
+  email: any, 
+  password: any, 
+  role: string = 'user',
+  driverInfo?: any
+) => {
   try {
-    const response: any = await axiosApiInstance.post(`/auth/register`, {
-      name, phone, email, password
-    });
+    const payload: any = {
+      name, 
+      phone, 
+      email, 
+      password,
+      role
+    };
+
+    if (role === 'driver' && driverInfo) {
+      payload.driverInfo = driverInfo;
+    }
+
+    const response: any = await axiosApiInstance.post(`/auth/register`, payload);
     return response;
   } catch (error) {
     console.log("lỗi postRegisterWeb", error);
@@ -46,10 +63,12 @@ export const postRegisterWeb = async (name: any, phone: any, email: any, passwor
   }
 };
 
-export const postLoginWeb = async (email: any, password: any) => {
+export const postLoginWeb = async (email: any, password: any, role: string = 'user') => {
   try {
     const response: any = await axiosApiInstance.post(`/auth/login`, {
-       email, password
+       email, 
+       password,
+       role
     });
     return response;
   } catch (error: any) {
@@ -100,4 +119,3 @@ export const getRouteDistance = async (start: [number, number], end: [number, nu
     return 1;
   }
 };
-
