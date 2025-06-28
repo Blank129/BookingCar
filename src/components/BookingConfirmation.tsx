@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Check, Clock, Phone, MessageCircle, Star, User, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Check, Clock, Phone, MessageCircle, Star, ArrowLeft } from 'lucide-react';
 
 interface Location {
   name: string;

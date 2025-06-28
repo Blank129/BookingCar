@@ -11,13 +11,13 @@ import {
 import VehicleSelector, {
   Vehicle,
   vehicleTypes,
-} from "../components/VehicleSelector";
-import MapView from "../components/MapView";
-import LocationInput from "../components/LocationInput";
-import BookingConfirmation from "../components/BookingConfirmation";
+} from "../../components/VehicleSelector";
+import MapView from "../../components/MapView";
+import LocationInput from "../../components/LocationInput";
+import BookingConfirmation from "../../components/BookingConfirmation";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import { getRouteDistance } from "../service/api";
+import { AuthContext } from "../../context/authContext";
+import { getRouteDistance } from "../../service/api";
 
 interface Location {
   id: string;

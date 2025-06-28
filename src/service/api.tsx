@@ -1,27 +1,8 @@
 import axios from "axios";
 import axiosApiInstance from "./axios";
 
-export const getLocationData = async (query: string, signal?: AbortSignal) => {
-  const response = await axios.get(
-    "https://nominatim.openstreetmap.org/search",
-    {
-      params: {
-        q: query,
-        format: "json",
-        addressdetails: 1,
-        limit: 8,
-        countrycodes: "vn",
-      },
-      headers: {
-        "Accept-Language": "vi",
-      },
-      signal,
-    }
-  );
 
-  return response.data;
-};
-
+//Auth
 export const postLoginGoogle = async (id_token: string) => {
   try {
     const response: any = await axiosApiInstance.post(`/auth/google`, {
@@ -68,6 +49,28 @@ export const postDecodeToken = async (token: any) => {
     console.log("lỗi decode", error);
     return error;
   }
+};
+
+//Map and Route
+export const getLocationData = async (query: string, signal?: AbortSignal) => {
+  const response = await axios.get(
+    "https://nominatim.openstreetmap.org/search",
+    {
+      params: {
+        q: query,
+        format: "json",
+        addressdetails: 1,
+        limit: 8,
+        countrycodes: "vn",
+      },
+      headers: {
+        "Accept-Language": "vi",
+      },
+      signal,
+    }
+  );
+
+  return response.data;
 };
 
 export const postRoute = async (
