@@ -1,14 +1,18 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
 import { postDecodeToken, postLoginGoogle, postLoginWeb, postRegisterWeb } from "../service/apiUser";
 import { useNavigate } from "react-router-dom";
+import { postLoginDriver, postRegisterDriver } from "../service/apiDriver";
 
 type AuthContextType = {
   userInfo: any;
   setUserInfo: any;
   handlePostLoginGoogle: any;
   handlePostLoginWeb: any;
+  handlePostLoginDriver: any;
   handlePostRegisterWeb: any;
+  handlePostRegisterDriver: any;
   handlePostDecodeToken: any;
+  
 };
 
 const AuthContexts = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<any>("");
+  const [driverInfo, setDriverInfo] = useState<any>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePostLoginGoogle = async (id_token: any) => {
@@ -69,6 +74,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const handlePostLoginDriver = async (email: any, password: any) => {
+    try {
+      const res = await postLoginDriver(email, password);
+      if (res.status === 200) {
+        localStorage.setItem("driverInfo", res.data.token);
+        navigate("/driver/dashboard");
+      } else {
+        console.log("res else", res);
+        alert(res);
+      }
+    } catch (error) {
+      console.error("Lỗi đăng nhập driver:", error);
+    }
+  };
+
+  const handlePostRegisterDriver = async (
+    name: any, phone: any,id_type_car: any, drive_license_number: any, plate_license: any, email: any, password: any
+  ) => {
+    try {
+      const res = await postRegisterDriver(name, phone,id_type_car, drive_license_number, plate_license, email, password);
+      if (res.status === 200) {
+      } else {
+        alert(res.data.message);
+      }
+    } catch (error) {
+      console.error("Lỗi đăng ký driver:", error);
+    }
+  };
+
   const handlePostDecodeToken = async (token: any) => {
     try {
       const res = await postDecodeToken(token);
@@ -87,7 +121,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUserInfo,
         handlePostLoginGoogle,
         handlePostLoginWeb,
+        handlePostLoginDriver,
         handlePostRegisterWeb,
+        handlePostRegisterDriver,
         handlePostDecodeToken
       }}
     >

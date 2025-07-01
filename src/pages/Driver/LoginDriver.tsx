@@ -10,14 +10,16 @@ import {
   ArrowLeft,
   Shield,
   MapPin,
-  Clock
+  Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import { CarContext } from "../../context/carContext";
 
 const DriverLoginPage = () => {
   const navigate = useNavigate();
-  const { handlePostLoginWeb, handlePostRegisterWeb } = AuthContext();
+  const { handlePostLoginDriver, handlePostRegisterDriver } = AuthContext();
+  const { cars } = CarContext();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +31,7 @@ const DriverLoginPage = () => {
     confirmPassword: "",
     vehicleType: "",
     licenseNumber: "",
-    vehicleNumber: ""
+    vehicleNumber: "",
   });
 
   const handleInputChange = (e: any) => {
@@ -45,21 +47,16 @@ const DriverLoginPage = () => {
 
     try {
       if (isLogin) {
-        // Login as driver
-        await handlePostLoginWeb(formData.email, formData.password, 'driver');
+        await handlePostLoginDriver(formData.email, formData.password);
       } else {
-        // Register as driver
-        await handlePostRegisterWeb(
+        await handlePostRegisterDriver(
           formData.name,
           formData.phone,
+          formData.vehicleType,
+          formData.licenseNumber,
+          formData.vehicleNumber,
           formData.email,
-          formData.password,
-          'driver',
-          {
-            vehicleType: formData.vehicleType,
-            licenseNumber: formData.licenseNumber,
-            vehicleNumber: formData.vehicleNumber
-          }
+          formData.password
         );
         setIsLogin(true);
         setFormData({
@@ -70,7 +67,7 @@ const DriverLoginPage = () => {
           confirmPassword: "",
           vehicleType: "",
           licenseNumber: "",
-          vehicleNumber: ""
+          vehicleNumber: "",
         });
       }
     } catch (error) {
@@ -90,7 +87,7 @@ const DriverLoginPage = () => {
       confirmPassword: "",
       vehicleType: "",
       licenseNumber: "",
-      vehicleNumber: ""
+      vehicleNumber: "",
     });
   };
 
@@ -104,7 +101,7 @@ const DriverLoginPage = () => {
         >
           <ArrowLeft color="#ffffff" />
         </div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-20 right-20 w-32 h-32 bg-white/10 rounded-full"></div>
         <div className="absolute bottom-32 left-16 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -125,7 +122,8 @@ const DriverLoginPage = () => {
           </h2>
 
           <p className="text-lg text-green-100 mb-8 leading-relaxed">
-            Gia nhập mạng lưới tài xế VnCar và bắt đầu kiếm thu nhập ổn định với lịch trình linh hoạt.
+            Gia nhập mạng lưới tài xế VnCar và bắt đầu kiếm thu nhập ổn định với
+            lịch trình linh hoạt.
           </p>
 
           <div className="space-y-4 mb-8">
@@ -152,7 +150,9 @@ const DriverLoginPage = () => {
           <div className="grid grid-cols-2 gap-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="text-2xl font-bold text-green-200">10K+</div>
-              <div className="text-sm text-green-100">Tài xế đang hoạt động</div>
+              <div className="text-sm text-green-100">
+                Tài xế đang hoạt động
+              </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="text-2xl font-bold text-green-200">4.8★</div>
@@ -221,10 +221,22 @@ const DriverLoginPage = () => {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                     required={!isLogin}
                   >
-                    <option value="">Chọn loại xe</option>
-                    <option value="bike">Xe máy</option>
-                    <option value="car">Ô tô 4 chỗ</option>
-                    <option value="premium">Ô tô cao cấp</option>
+                    {cars && cars.length > 0 ? (
+                      <>
+                        <option value="" disabled>
+                          Chọn loại xe
+                        </option>
+                        {cars.map((car: any) => (
+                          <option key={car.id} value={car.id}>
+                            {car.type_car}
+                          </option>
+                        ))}
+                      </>
+                    ) : (
+                      <option value="" disabled>
+                        Không có loại xe nào
+                      </option>
+                    )}
                   </select>
                 </div>
 
@@ -357,7 +369,7 @@ const DriverLoginPage = () => {
           {/* Back to user login */}
           <div className="text-center mt-4">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
               className="text-gray-500 hover:text-gray-700 text-sm"
             >
               Đăng nhập với tài khoản khách hàng
