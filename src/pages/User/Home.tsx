@@ -17,7 +17,7 @@ import LocationInput from "../../components/LocationInput";
 import BookingConfirmation from "../../components/BookingConfirmation";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { getRouteDistance } from "../../service/api";
+import { getRouteDistance } from "../../service/apiUser";
 
 interface Location {
   id: string;

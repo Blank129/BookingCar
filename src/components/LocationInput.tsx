@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Clock, X, Loader } from 'lucide-react';
-import { getLocationData } from '../service/api';
+import { getLocationData } from '../service/apiUser';
 
 interface Location {
   id: string;

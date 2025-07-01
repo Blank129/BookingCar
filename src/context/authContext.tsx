@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
-import { postDecodeToken, postLoginGoogle, postLoginWeb, postRegisterWeb } from "../service/api";
+import { postDecodeToken, postLoginGoogle, postLoginWeb, postRegisterWeb } from "../service/apiUser";
 import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {

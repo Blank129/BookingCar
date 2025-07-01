@@ -1,11 +1,11 @@
 import axios from "axios";
-import axiosApiInstance from "./axios";
+import {axiosApiUserInstance} from "./axios";
 
 
 //Auth
 export const postLoginGoogle = async (id_token: string) => {
   try {
-    const response: any = await axiosApiInstance.post(`/auth/google`, {
+    const response: any = await axiosApiUserInstance.post(`/auth/google`, {
       id_token,
     });
     return response;
@@ -17,7 +17,7 @@ export const postLoginGoogle = async (id_token: string) => {
 
 export const postRegisterWeb = async (name: any, phone: any, email: any, password: any) => {
   try {
-    const response: any = await axiosApiInstance.post(`/auth/register`, {
+    const response: any = await axiosApiUserInstance.post(`/auth/register`, {
       name, phone, email, password
     });
     return response;
@@ -29,7 +29,7 @@ export const postRegisterWeb = async (name: any, phone: any, email: any, passwor
 
 export const postLoginWeb = async (email: any, password: any) => {
   try {
-    const response: any = await axiosApiInstance.post(`/auth/login`, {
+    const response: any = await axiosApiUserInstance.post(`/auth/login`, {
        email, password
     });
     return response;
@@ -41,7 +41,7 @@ export const postLoginWeb = async (email: any, password: any) => {
 
 export const postDecodeToken = async (token: any) => {
   try {
-    const response: any = await axiosApiInstance.post(`/auth/decode`, {
+    const response: any = await axiosApiUserInstance.post(`/auth/decode`, {
        token
     });
     return response;
@@ -78,7 +78,7 @@ export const postRoute = async (
   destination: [number, number]
 ) => {
   try {
-    const response: any = await axiosApiInstance.post(`/route/path`, {
+    const response: any = await axiosApiUserInstance.post(`/route/path`, {
       pickup,
       destination,
     });
@@ -92,7 +92,7 @@ export const postRoute = async (
 export const getRouteDistance = async (start: [number, number], end: [number, number]
 ): Promise<number> => {
   try {
-    const res = await axiosApiInstance.post("/route/distance", {
+    const res = await axiosApiUserInstance.post("/route/distance", {
       start,
       end,
     });

@@ -1,7 +1,9 @@
 import axios from "axios";
 
-const axiosApiInstance = axios.create({
-  baseURL: "http://localhost:5000/api",
+export const axiosApiUserInstance = axios.create({
+  baseURL: "http://localhost:5000/api/user",
 });
 
-export default axiosApiInstance;
+export const axiosApiDriverInstance = axios.create({
+  baseURL: "http://localhost:5000/api/driver",
+});
