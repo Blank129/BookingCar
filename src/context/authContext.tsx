@@ -32,7 +32,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const data = await postLoginGoogle(id_token);
       if (data.status === 200) {
         setUserInfo(data.data);
-        navigate("/");
+        // Check if user is driver and redirect accordingly
+        if (data.data.user.role === 'driver') {
+          navigate("/driver/dashboard");
+        } else {
+          navigate("/");
+        }
       } else {
         console.error("Đăng nhập thất bại:", data);
         alert(data?.error || "Đăng nhập thất bại");
@@ -49,7 +54,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const res = await postLoginWeb(email, password);
       if (res.status === 200) {
         localStorage.setItem("userInfoWeb", res.data.token);
-        navigate("/");
+        if (res.data.user.role === 'driver') {
+          navigate("/driver/dashboard");
+        } else {
+          navigate("/");
+        }
       } else {
         console.log("res else", res);
         alert(res);
@@ -63,11 +72,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     name: any,
     phone: any,
     email: any,
-    password: any
+    password: any,
   ) => {
     try {
       const res = await postRegisterWeb(name, phone, email, password);
       if (res.status === 200) {
+        alert("Đăng ký thành công! Vui lòng đăng nhập.");
       } else {
         alert(res.data.message);
       }

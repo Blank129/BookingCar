@@ -103,4 +103,3 @@ export const getRouteDistance = async (start: [number, number], end: [number, nu
     return 1;
   }
 };
-
