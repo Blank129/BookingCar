@@ -112,7 +112,7 @@ const mockTripHistory: Trip[] = [
 
 export default function HomeDriver() {
   const navigate = useNavigate();
-  const { userInfo, setUserInfo } = AuthContext();
+  const { userInfo, setUserInfo, driverInfo, setDriverInfo, handlePostDecodeToken } = AuthContext();
   const [activeTab, setActiveTab] = useState<'requests' | 'earnings' | 'history'>('requests');
   const [isOnline, setIsOnline] = useState(false);
   const [currentTrip, setCurrentTrip] = useState<TripRequest | null>(null);
@@ -123,6 +123,15 @@ export default function HomeDriver() {
     week: 2800000,
     month: 12500000
   });
+
+  useEffect(() => {
+    const driverToken = localStorage.getItem('driverInfo');
+    if(driverToken) {
+      handlePostDecodeToken(driverToken);
+    } else {
+      setDriverInfo(null);
+    }
+  },[])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -194,8 +203,9 @@ export default function HomeDriver() {
   const handleLogout = () => {
     localStorage.removeItem('id_token');
     localStorage.removeItem('userInfoWeb');
+    localStorage.removeItem('driverInfo');
     setUserInfo(null);
-    navigate('/login');
+    navigate('/driver/login');
   };
 
   return (

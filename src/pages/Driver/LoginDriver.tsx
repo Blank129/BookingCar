@@ -97,7 +97,7 @@ const DriverLoginPage = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-500 to-green-700 p-12 flex-col justify-center relative overflow-hidden">
         <div
           className="absolute top-[30px] left-[30px] w-10 h-10 bg-white bg-opacity-10 rounded-full flex items-center justify-center cursor-pointer"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/login")}
         >
           <ArrowLeft color="#ffffff" />
         </div>

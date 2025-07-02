@@ -6,6 +6,8 @@ import { postLoginDriver, postRegisterDriver } from "../service/apiDriver";
 type AuthContextType = {
   userInfo: any;
   setUserInfo: any;
+  driverInfo: any;
+  setDriverInfo: any;
   handlePostLoginGoogle: any;
   handlePostLoginWeb: any;
   handlePostLoginDriver: any;
@@ -108,6 +110,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const res = await postDecodeToken(token);
       if(res.status === 200) {
         setUserInfo(res.data);
+        setDriverInfo(res.data);
       }
     } catch (error) {
       console.error("Lỗi giải mã token:", error);
@@ -119,6 +122,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         userInfo,
         setUserInfo,
+        driverInfo,
+        setDriverInfo,
         handlePostLoginGoogle,
         handlePostLoginWeb,
         handlePostLoginDriver,

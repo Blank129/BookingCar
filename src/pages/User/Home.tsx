@@ -63,27 +63,34 @@ function HomePage() {
     }
   }, []);
 
-  const handlePickupSelect = async (location: Location) => {
-  setPickup(location);
-  if (destination) {
-    const dist = await getRouteDistance(
-      location.coordinates,
-      destination.coordinates
-    );
-    setDistance(dist);
-  }
-};
+  useEffect(() => {
+    const tokenDriver = localStorage.getItem("driverInfo");
+    if (tokenDriver) {
+      navigate("/driver/dashboard");
+    } 
+  },[])
 
-const handleDestinationSelect = async (location: Location) => {
-  setDestination(location);
-  if (pickup) {
-    const dist = await getRouteDistance(
-      pickup.coordinates,
-      location.coordinates
-    );
-    setDistance(dist);
-  }
-};
+  const handlePickupSelect = async (location: Location) => {
+    setPickup(location);
+    if (destination) {
+      const dist = await getRouteDistance(
+        location.coordinates,
+        destination.coordinates
+      );
+      setDistance(dist);
+    }
+  };
+
+  const handleDestinationSelect = async (location: Location) => {
+    setDestination(location);
+    if (pickup) {
+      const dist = await getRouteDistance(
+        pickup.coordinates,
+        location.coordinates
+      );
+      setDistance(dist);
+    }
+  };
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -127,7 +134,6 @@ const handleDestinationSelect = async (location: Location) => {
     navigate("/profile");
     setIsDropdownOpen(false);
   };
-  
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -184,13 +190,12 @@ const handleDestinationSelect = async (location: Location) => {
                 </button>
                 <button
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  onClick={() => setIsSidebarOpen(false)} // Toggle sidebar
+                  onClick={() => setIsSidebarOpen(false)}
                 >
                   <Menu className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
                 </button>
                 {userInfo?.user ? (
                   <div className="relative">
-                    {/* Avatar Button */}
                     <button
                       className="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -407,11 +412,10 @@ const handleDestinationSelect = async (location: Location) => {
         <>
           <button
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            onClick={() => setIsSidebarOpen(true)} 
+            onClick={() => setIsSidebarOpen(true)}
           >
             <Menu className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           </button>
-         
         </>
       )}
 

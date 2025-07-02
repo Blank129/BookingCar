@@ -82,8 +82,8 @@ export default function VehicleSelector({ vehicles, selectedVehicle, onVehicleSe
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 md:space-x-4">
                   <div className={`p-2 md:p-3 rounded-lg ${
-                    vehicle.type === 'bike' ? 'bg-green-100 text-green-600' :
-                    vehicle.type === 'car' ? 'bg-blue-100 text-blue-600' :
+                    vehicle.id === 'bike' ? 'bg-green-100 text-green-600' :
+                    vehicle.id === 'car' ? 'bg-blue-100 text-blue-600' :
                     'bg-purple-100 text-purple-600'
                   }`}>
                     {vehicle.icon}
