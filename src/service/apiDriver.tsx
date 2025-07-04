@@ -33,3 +33,17 @@ export const postLoginDriver = async (email: any, password: any) => {
     return error.response.data.error;
   }
 };
+
+export const updateOnlineStatus = async (driver_id: any, isOnline: boolean, lat?: number, lng?: number) => {
+  try {
+    const res = await axiosApiDriverInstance.post('/status', {
+      driver_id,
+      is_online: isOnline,
+      lat,
+      lng
+    });
+    return res;
+  } catch (err) {
+    console.error('Lỗi cập nhật trạng thái tài xế:', err);
+  }
+};
