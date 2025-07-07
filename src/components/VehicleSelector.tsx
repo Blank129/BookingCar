@@ -1,5 +1,5 @@
 import React from "react";
-import { Car, Bike, Crown, Clock, Users } from "lucide-react";
+import { Car, Bike, Crown, Users } from "lucide-react";
 import { CarContext } from "../context/carContext";
 
 export interface Vehicle {
