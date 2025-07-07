@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Car,
   MapPin,
-  Clock,
   DollarSign,
   CheckCircle,
   XCircle,
@@ -10,10 +9,8 @@ import {
   User,
   Calendar,
   TrendingUp,
-  Menu,
   LogOut,
   Bell,
-  Settings,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
