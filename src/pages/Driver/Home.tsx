@@ -130,34 +130,68 @@ export default function HomeDriver() {
     };
   }, [isOnline, driverInfo?.user?.id]);
 
-  // useEffect(() => {
-  //   if (!driverInfo?.user?.id || !isOnline) return;
+  const parseCoordinates = (locationString: string): [number, number] => {
+    try {
+      const coords = JSON.parse(locationString);
+      return [coords[0], coords[1]];
+    } catch (error) {
+      console.error("Error parsing coordinates:", error);
+      return [0, 0];
+    }
+  };
 
-  //   console.log("Bắt đầu cập nhật vị trí mỗi 10 giây...");
+  const calculateEstimatedTime = (distance: string): string => {
+    const distanceNum = parseFloat(distance);
+    const timeInMinutes = Math.round(distanceNum * 3);
+    return `${timeInMinutes} phút`;
+  };
 
-  //   const interval = setInterval(() => {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (pos) => {
-  //         const { latitude, longitude } = pos.coords;
-  //         console.log("Cập nhật vị trí:", latitude, longitude);
-  //         updateOnlineStatus(driverInfo.user.id, true, latitude, longitude);
-  //       },
-  //       (err) => {
-  //         console.error("Lỗi khi lấy vị trí:", err);
-  //       },
-  //       {
-  //         enableHighAccuracy: true,
-  //         maximumAge: 10000,
-  //         timeout: 10000,
-  //       }
-  //     );
-  //   }, 10000);
+  const convertBookingToTripRequest = (booking: any): TripRequest => {
+    return {
+      id: booking.id.toString(),
+      passenger: {
+        name: `Khách hàng #${booking.id_user}`, 
+        rating: 4.5,
+        phone: "0909123456", 
+      },
+      pickup: {
+        name: booking.location_from_name || "Điểm đón",
+        address: booking.location_from_name || "Điểm đón",
+        coordinates: parseCoordinates(booking.location_from),
+      },
+      destination: {
+        name: booking.location_to_name || "Điểm đến",
+        address: booking.location_to_name || "Điểm đến",
+        coordinates: parseCoordinates(booking.location_to),
+      },
+      distance: parseFloat(booking.distance || "0"),
+      fare: parseInt(booking.total_price || "0"),
+      estimatedTime: calculateEstimatedTime(booking.distance || "0"),
+      vehicleType: "FastCar",
+    };
+  };
 
-  //   return () => {
-  //     console.log("Dừng cập nhật vị trí");
-  //     clearInterval(interval);
-  //   };
-  // }, [driverInfo?.user?.id, isOnline]);
+  const availableRequests = listBookings
+    ? listBookings
+        .filter(booking => booking.id_driver === null)
+        .sort((a, b) => new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime())
+        .map(convertBookingToTripRequest)
+    : [];
+
+  const completedTrips = listBookings
+    ? listBookings
+        .filter(booking => booking.id_driver !== null)
+        .map(booking => ({
+          id: booking.id.toString(),
+          passenger: `Khách hàng #${booking.id_user}`,
+          pickup: booking.location_from_name || "Điểm đón",
+          destination: booking.location_to_name || "Điểm đến",
+          fare: parseInt(booking.total_price || "0"),
+          date: new Date(booking.created_at).toLocaleDateString('vi-VN'),
+          status: "completed" as const,
+          distance: parseFloat(booking.distance || "0"),
+        }))
+    : [];
 
   const parseCoordinates = (locationString: string): [number, number] => {
     try {
