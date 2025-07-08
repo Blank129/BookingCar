@@ -39,17 +39,6 @@ interface TripRequest {
   vehicleType: string;
 }
 
-interface Trip {
-  id: string;
-  passenger: string;
-  pickup: string;
-  destination: string;
-  fare: number;
-  date: string;
-  status: "completed" | "cancelled";
-  distance: number;
-}
-
 export default function HomeDriver() {
   const navigate = useNavigate();
   const {
@@ -135,6 +124,35 @@ export default function HomeDriver() {
       }
     };
   }, [isOnline, driverInfo?.user?.id]);
+
+  // useEffect(() => {
+  //   if (!driverInfo?.user?.id || !isOnline) return;
+
+  //   console.log("Bắt đầu cập nhật vị trí mỗi 10 giây...");
+
+  //   const interval = setInterval(() => {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (pos) => {
+  //         const { latitude, longitude } = pos.coords;
+  //         console.log("Cập nhật vị trí:", latitude, longitude);
+  //         updateOnlineStatus(driverInfo.user.id, true, latitude, longitude);
+  //       },
+  //       (err) => {
+  //         console.error("Lỗi khi lấy vị trí:", err);
+  //       },
+  //       {
+  //         enableHighAccuracy: true,
+  //         maximumAge: 10000,
+  //         timeout: 10000,
+  //       }
+  //     );
+  //   }, 10000);
+
+  //   return () => {
+  //     console.log("Dừng cập nhật vị trí");
+  //     clearInterval(interval);
+  //   };
+  // }, [driverInfo?.user?.id, isOnline]);
 
   const parseCoordinates = (locationString: string): [number, number] => {
     try {
