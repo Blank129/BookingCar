@@ -50,64 +50,6 @@ interface Trip {
   distance: number;
 }
 
-const mockTripRequests: TripRequest[] = [
-  {
-    id: "1",
-    passenger: {
-      name: "Nguyễn Văn A",
-      rating: 4.8,
-      phone: "0909123456",
-    },
-    pickup: {
-      name: "Sân bay Tân Sơn Nhất",
-      address: "Tân Bình, TP.HCM",
-      coordinates: [10.8181, 106.6517],
-    },
-    destination: {
-      name: "Landmark 81",
-      address: "Bình Thạnh, TP.HCM",
-      coordinates: [10.7953, 106.7212],
-    },
-    distance: 12.5,
-    fare: 150000,
-    estimatedTime: "25 phút",
-    vehicleType: "FastCar",
-  },
-];
-
-const mockTripHistory: Trip[] = [
-  {
-    id: "1",
-    passenger: "Nguyễn Văn A",
-    pickup: "Sân bay Tân Sơn Nhất",
-    destination: "Landmark 81",
-    fare: 150000,
-    date: "2025-01-15",
-    status: "completed",
-    distance: 12.5,
-  },
-  {
-    id: "2",
-    passenger: "Trần Thị B",
-    pickup: "Chợ Bến Thành",
-    destination: "Nhà hát Thành phố",
-    fare: 80000,
-    date: "2025-01-15",
-    status: "completed",
-    distance: 5.2,
-  },
-  {
-    id: "3",
-    passenger: "Lê Văn C",
-    pickup: "Công viên Tao Đàn",
-    destination: "Bệnh viện Chợ Rẫy",
-    fare: 120000,
-    date: "2025-01-14",
-    status: "completed",
-    distance: 8.7,
-  },
-];
-
 export default function HomeDriver() {
   const navigate = useNavigate();
   const {
@@ -121,12 +63,10 @@ export default function HomeDriver() {
     "requests" | "earnings" | "history"
   >("requests");
   const [isOnline, setIsOnline] = useState(false);
-  const [currentTrip, setCurrentTrip] = useState<TripRequest | null>(null);
+  const [currentTrip, setCurrentTrip] = useState<any | null>(null);
   const [tripStatus, setTripStatus] = useState<
     "going_to_pickup" | "arrived_pickup" | "passenger_onboard" | "completed"
   >("going_to_pickup");
-  const [tripRequests, setTripRequests] =
-    useState<TripRequest[]>(mockTripRequests);
   const [earnings, setEarnings] = useState({
     today: 450000,
     week: 2800000,
@@ -143,13 +83,39 @@ export default function HomeDriver() {
   }, []);
 
   useEffect(() => {
+    if (driverInfo?.user?.id_type_car) {
+      handleGetListBooking(driverInfo.user.id_type_car);
+
+      const channel = supabase
+        .channel("booking_changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "booking",
+            filter: `id_type_car=eq.${driverInfo.user.id_type_car}`,
+          },
+          (payload) => {
+            console.log("Realtime event:", payload);
+            handleGetListBooking(driverInfo.user.id_type_car); 
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [driverInfo]);
+
+  useEffect(() => {
     let watchId: number;
 
     if (isOnline && driverInfo?.user?.id) {
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          // Gọi API cập nhật vị trí
           updateOnlineStatus(driverInfo.user.id, true, latitude, longitude);
         },
         (err) => {
@@ -170,34 +136,68 @@ export default function HomeDriver() {
     };
   }, [isOnline, driverInfo?.user?.id]);
 
-  // useEffect(() => {
-  //   if (!driverInfo?.user?.id || !isOnline) return;
+  const parseCoordinates = (locationString: string): [number, number] => {
+    try {
+      const coords = JSON.parse(locationString);
+      return [coords[0], coords[1]];
+    } catch (error) {
+      console.error("Error parsing coordinates:", error);
+      return [0, 0];
+    }
+  };
 
-  //   console.log("Bắt đầu cập nhật vị trí mỗi 10 giây...");
+  const calculateEstimatedTime = (distance: string): string => {
+    const distanceNum = parseFloat(distance);
+    const timeInMinutes = Math.round(distanceNum * 3);
+    return `${timeInMinutes} phút`;
+  };
 
-  //   const interval = setInterval(() => {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (pos) => {
-  //         const { latitude, longitude } = pos.coords;
-  //         console.log("Cập nhật vị trí:", latitude, longitude);
-  //         updateOnlineStatus(driverInfo.user.id, true, latitude, longitude);
-  //       },
-  //       (err) => {
-  //         console.error("Lỗi khi lấy vị trí:", err);
-  //       },
-  //       {
-  //         enableHighAccuracy: true,
-  //         maximumAge: 10000,
-  //         timeout: 10000,
-  //       }
-  //     );
-  //   }, 10000);
+  const convertBookingToTripRequest = (booking: any): TripRequest => {
+    return {
+      id: booking.id.toString(),
+      passenger: {
+        name: `Khách hàng #${booking.id_user}`, 
+        rating: 4.5,
+        phone: "0909123456", 
+      },
+      pickup: {
+        name: booking.location_from_name || "Điểm đón",
+        address: booking.location_from_name || "Điểm đón",
+        coordinates: parseCoordinates(booking.location_from),
+      },
+      destination: {
+        name: booking.location_to_name || "Điểm đến",
+        address: booking.location_to_name || "Điểm đến",
+        coordinates: parseCoordinates(booking.location_to),
+      },
+      distance: parseFloat(booking.distance || "0"),
+      fare: parseInt(booking.total_price || "0"),
+      estimatedTime: calculateEstimatedTime(booking.distance || "0"),
+      vehicleType: "FastCar",
+    };
+  };
 
-  //   return () => {
-  //     console.log("Dừng cập nhật vị trí");
-  //     clearInterval(interval);
-  //   };
-  // }, [driverInfo?.user?.id, isOnline]);
+  const availableRequests = listBookings
+    ? listBookings
+        .filter(booking => booking.id_driver === null)
+        .sort((a, b) => new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime())
+        .map(convertBookingToTripRequest)
+    : [];
+
+  const completedTrips = listBookings
+    ? listBookings
+        .filter(booking => booking.id_driver !== null)
+        .map(booking => ({
+          id: booking.id.toString(),
+          passenger: `Khách hàng #${booking.id_user}`,
+          pickup: booking.location_from_name || "Điểm đón",
+          destination: booking.location_to_name || "Điểm đến",
+          fare: parseInt(booking.total_price || "0"),
+          date: new Date(booking.created_at).toLocaleDateString('vi-VN'),
+          status: "completed" as const,
+          distance: parseFloat(booking.distance || "0"),
+        }))
+    : [];
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -208,12 +208,12 @@ export default function HomeDriver() {
 
   const handleAcceptTrip = (trip: TripRequest) => {
     setCurrentTrip(trip);
-    setTripRequests((prev) => prev.filter((t) => t.id !== trip.id));
     setTripStatus("going_to_pickup");
+
   };
 
   const handleRejectTrip = (tripId: string) => {
-    setTripRequests((prev) => prev.filter((t) => t.id !== tripId));
+    console.log("Rejecting trip:", tripId);
   };
 
   const handleTripStatusUpdate = () => {
@@ -517,7 +517,7 @@ export default function HomeDriver() {
                     : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
-                Yêu cầu chuyến đi
+                Yêu cầu chuyến đi ({availableRequests.length})
               </button>
               <button
                 onClick={() => setActiveTab("earnings")}
@@ -537,7 +537,7 @@ export default function HomeDriver() {
                     : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
-                Lịch sử chuyến đi
+                Lịch sử chuyến đi ({completedTrips.length})
               </button>
             </nav>
           </div>
@@ -558,7 +558,7 @@ export default function HomeDriver() {
                       Bật chế độ online để nhận yêu cầu chuyến đi
                     </p>
                   </div>
-                ) : tripRequests.length === 0 ? (
+                ) : availableRequests.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                       <MapPin className="w-8 h-8 text-blue-600" />
@@ -571,7 +571,7 @@ export default function HomeDriver() {
                     </p>
                   </div>
                 ) : (
-                  tripRequests.map((request) => (
+                  availableRequests.map((request) => (
                     <div
                       key={request.id}
                       className="border border-gray-200 rounded-lg p-6"
@@ -603,9 +603,9 @@ export default function HomeDriver() {
                       <div className="space-y-3 mb-4">
                         <div className="flex items-start space-x-3">
                           <div className="w-3 h-3 bg-green-500 rounded-full mt-2"></div>
-                          <div>
+                          <div className="flex-1">
                             <p className="font-medium text-gray-900">
-                              {request.pickup.name}
+                              Điểm đón
                             </p>
                             <p className="text-sm text-gray-600">
                               {request.pickup.address}
@@ -617,9 +617,9 @@ export default function HomeDriver() {
 
                         <div className="flex items-start space-x-3">
                           <div className="w-3 h-3 bg-red-500 rounded-full mt-2"></div>
-                          <div>
+                          <div className="flex-1">
                             <p className="font-medium text-gray-900">
-                              {request.destination.name}
+                              Điểm đến
                             </p>
                             <p className="text-sm text-gray-600">
                               {request.destination.address}
@@ -691,12 +691,16 @@ export default function HomeDriver() {
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">24</p>
-                      <p className="text-sm text-gray-600">Chuyến hôm nay</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {completedTrips.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Chuyến đã hoàn thành</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">156</p>
-                      <p className="text-sm text-gray-600">Chuyến tuần này</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {availableRequests.length}
+                      </p>
+                      <p className="text-sm text-gray-600">Yêu cầu đang chờ</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-gray-900">4.8</p>
@@ -705,9 +709,11 @@ export default function HomeDriver() {
                       </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">8.5h</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {isOnline ? "Online" : "Offline"}
+                      </p>
                       <p className="text-sm text-gray-600">
-                        Giờ online hôm nay
+                        Trạng thái hiện tại
                       </p>
                     </div>
                   </div>
@@ -718,7 +724,7 @@ export default function HomeDriver() {
             {/* History Tab */}
             {activeTab === "history" && (
               <div className="space-y-4">
-                {mockTripHistory.map((trip) => (
+                {listBookings.map((trip) => (
                   <div
                     key={trip.id}
                     className="border border-gray-200 rounded-lg p-4"
