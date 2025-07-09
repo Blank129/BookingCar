@@ -47,3 +47,13 @@ export const updateOnlineStatus = async (driver_id: any, isOnline: boolean, lat?
     console.error('Lỗi cập nhật trạng thái tài xế:', err);
   }
 };
+
+export const getBookings = async (id_type_car: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.get(`/bookings/${id_type_car}`);
+    return response;
+  } catch (error) {
+    console.log("lỗi getBookings", error);
+    return error;
+  }
+};

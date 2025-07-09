@@ -15,6 +15,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { updateOnlineStatus } from "../../service/apiDriver";
+import { CarContext } from "../../context/carContext";
+import { supabase } from "../../config/supabase";
 
 interface TripRequest {
   id: string;
@@ -48,6 +50,7 @@ export default function HomeDriver() {
     setDriverInfo,
     handlePostDecodeToken,
   } = AuthContext();
+  const { listBookings, handleGetListBooking } = CarContext();
   const [activeTab, setActiveTab] = useState<
     "requests" | "earnings" | "history"
   >("requests");
@@ -61,6 +64,8 @@ export default function HomeDriver() {
     week: 2800000,
     month: 12500000,
   });
+
+  console.log("driverInfo", listBookings);
 
   useEffect(() => {
     const driverToken = localStorage.getItem("driverInfo");

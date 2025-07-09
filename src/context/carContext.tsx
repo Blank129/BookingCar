@@ -1,9 +1,11 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCars } from "../service/apiDriver";
+import { getBookings, getCars } from "../service/apiDriver";
 
 type CarContextType = {
   cars: any[];
+  listBookings: any[];
+  handleGetListBooking: any
 };
 
 const CarContexts = createContext<CarContextType | undefined>(undefined);
@@ -13,6 +15,7 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const [cars, setCars] = useState([]);
+  const [listBookings, setListBookings] = useState([]);
 
   const handleGetAllCars = async () => {
     try {
@@ -24,6 +27,16 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Lỗi lấy danh sách xe:", error);
     }
   };
+  const handleGetListBooking = async (id_type_car: any) => {
+    try {
+      const res = await getBookings(id_type_car);
+      if (res.status === 200) {
+        setListBookings(res.data.data);
+      }
+    } catch (error) {
+      console.error("Lỗi lấy danh sách booking:", error);
+    }
+  };
 
   useEffect(() => {
     handleGetAllCars();
@@ -33,6 +46,8 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
     <CarContexts.Provider
       value={{
         cars,
+        listBookings,
+        handleGetListBooking
       }}
     >
       {children}
