@@ -461,7 +461,7 @@ function HomePage() {
           </>
         )}
 
-        <div className="hidden md:block flex-1 order-1 md:order-2">
+        <div className="hidden md:block flex-1 order-1 md:order-2 z-[1]">
           <MapView
             pickup={pickup}
             destination={destination}

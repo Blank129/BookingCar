@@ -57,3 +57,15 @@ export const getBookings = async (id_type_car: any) => {
     return error;
   }
 };
+
+export const postApproveBooking = async (id_booking: any, id_driver: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.post(`/approve`, {
+       id_booking, id_driver
+    });
+    return response;
+  } catch (error: any) {
+    console.log("lỗi postApproveBooking", error.response.data.error);
+    return error.response.data.error;
+  }
+};
