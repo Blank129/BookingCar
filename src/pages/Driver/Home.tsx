@@ -179,7 +179,7 @@ export default function HomeDriver() {
     return {
       id: booking.id.toString(),
       passenger: {
-        name: `Khách hàng #${booking.id_user}`, 
+        name: `${booking.users.name}`, 
         rating: 4.5,
         phone: "0909123456", 
       },
