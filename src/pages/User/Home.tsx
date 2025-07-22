@@ -99,7 +99,7 @@ function HomePage() {
   };
 
   const handleBookRide = async () => {
-    const isLogin = localStorage.getItem("userInfoWeb");
+    const isLogin = localStorage.getItem("userInfoWeb") || localStorage.getItem("id_token");
     if (isLogin) {
       if (pickup && destination && selectedVehicle) {
         try {
