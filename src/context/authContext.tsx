@@ -14,7 +14,6 @@ type AuthContextType = {
   handlePostRegisterWeb: any;
   handlePostRegisterDriver: any;
   handlePostDecodeToken: any;
-  
 };
 
 const AuthContexts = createContext<AuthContextType | undefined>(undefined);
@@ -32,7 +31,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const data = await postLoginGoogle(id_token);
       if (data.status === 200) {
         setUserInfo(data.data);
-        // Check if user is driver and redirect accordingly
         if (data.data.user.role === 'driver') {
           navigate("/driver/dashboard");
         } else {
@@ -147,7 +145,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-// Hook tiện lợi để dùng context
 export const AuthContext = (): AuthContextType => {
   const context = useContext(AuthContexts);
   if (!context) throw new Error("useTheme must be used within a ThemeProvider");

@@ -1,11 +1,13 @@
 import axios from "axios";
 
+const BASE_URL = "http://localhost:5000/api";
+
 export const axiosApiUserInstance = axios.create({
-  baseURL: "https://booking-car-be.vercel.app/api/user",
+  baseURL: `${BASE_URL}/user`,
 });
 
 export const axiosApiDriverInstance = axios.create({
-  baseURL: "https://booking-car-be.vercel.app/api/driver",
+  baseURL: `${BASE_URL}/driver`,
 });
 
 //http://localhost:5000
