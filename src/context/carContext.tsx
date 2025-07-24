@@ -17,7 +17,6 @@ const CarContexts = createContext<CarContextType | undefined>(undefined);
 export const CarProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const navigate = useNavigate();
   const [cars, setCars] = useState([]);
   const [listBookings, setListBookings] = useState([]);
   const [bookingUser, setBookingUser] = useState([]);
