@@ -1,11 +1,15 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBookings, getCars } from "../service/apiDriver";
+import { getBookingCars } from "../service/apiUser";
 
 type CarContextType = {
   cars: any[];
   listBookings: any[];
-  handleGetListBooking: any
+  handleGetListBooking: any;
+  bookingUser: any[];
+  setBookingUser: any;
+  handleGetBookingUser: any;
 };
 
 const CarContexts = createContext<CarContextType | undefined>(undefined);
@@ -16,6 +20,7 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
   const navigate = useNavigate();
   const [cars, setCars] = useState([]);
   const [listBookings, setListBookings] = useState([]);
+  const [bookingUser, setBookingUser] = useState([]);
 
   const handleGetAllCars = async () => {
     try {
@@ -38,6 +43,17 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const handleGetBookingUser = async (id_user: any) => {
+    try {
+      const res = await getBookingCars(id_user);
+      if (res.status === 200) {
+        setBookingUser(res.data.data);
+      }
+    } catch (error) {
+      console.error("Lỗi lấy danh sách booking user:", error);
+    }
+  }
+
   useEffect(() => {
     handleGetAllCars();
   },[])
@@ -47,7 +63,10 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         cars,
         listBookings,
-        handleGetListBooking
+        handleGetListBooking,
+        bookingUser,
+        setBookingUser,
+        handleGetBookingUser,
       }}
     >
       {children}
@@ -55,7 +74,6 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-// Hook tiện lợi để dùng context
 export const CarContext = (): CarContextType => {
   const context = useContext(CarContexts);
   if (!context) throw new Error("useTheme must be used within a ThemeProvider");

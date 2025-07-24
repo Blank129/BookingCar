@@ -114,6 +114,8 @@ export const getRouteDistance = async (
   }
 };
 
+//---------------------Cars--------------------------
+
 export const postBookingCar = async (
   id_user: any,
   id_type_car: any,
@@ -138,6 +140,19 @@ export const postBookingCar = async (
     return response;
   } catch (error) {
     console.log("lỗi postBookingCar", error);
+    return error;
+  }
+};
+
+export const getBookingCars = async (id_user: any) => {
+  try {
+    const response: any = await axiosApiUserInstance.get(
+      `/bookings/${id_user}`
+    );
+
+    return response;
+  } catch (error) {
+    console.log("lỗi getBookingCars", error);
     return error;
   }
 };
