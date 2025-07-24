@@ -14,10 +14,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import {
-  postApproveBooking,
-  updateOnlineStatus,
-} from "../../service/apiDriver";
+import { updateOnlineStatus } from "../../service/apiDriver";
 import { CarContext } from "../../context/carContext";
 import { supabase } from "../../config/supabase";
 
@@ -95,7 +92,7 @@ export default function HomeDriver() {
           },
           (payload) => {
             console.log("Realtime event:", payload);
-            handleGetListBooking(driverInfo.user.id_type_car);
+            handleGetListBooking(driverInfo.user.id_type_car); 
           }
         )
         .subscribe();
@@ -182,73 +179,6 @@ export default function HomeDriver() {
     return {
       id: booking.id.toString(),
       passenger: {
-        name: `${booking.users.name}`,
-        rating: 4.5,
-        phone: "0909123456",
-      },
-      pickup: {
-        name: booking.location_from_name || "Điểm đón",
-        address: booking.location_from_name || "Điểm đón",
-        coordinates: parseCoordinates(booking.location_from),
-      },
-      destination: {
-        name: booking.location_to_name || "Điểm đến",
-        address: booking.location_to_name || "Điểm đến",
-        coordinates: parseCoordinates(booking.location_to),
-      },
-      distance: parseFloat(booking.distance || "0"),
-      fare: parseInt(booking.total_price || "0"),
-      estimatedTime: calculateEstimatedTime(booking.distance || "0"),
-      vehicleType: "FastCar",
-    };
-  };
-
-  const availableRequests = listBookings
-    ? listBookings
-        .filter((booking) => booking.id_driver === null)
-        .sort(
-          (a, b) =>
-            new Date(b.created_at as string).getTime() -
-            new Date(a.created_at as string).getTime()
-        )
-        .map(convertBookingToTripRequest)
-    : [];
-
-  const completedTrips = listBookings
-    ? listBookings
-        .filter((booking) => booking.id_driver !== null)
-        .map((booking) => ({
-          id: booking.id.toString(),
-          passenger: `Khách hàng #${booking.id_user}`,
-          pickup: booking.location_from_name || "Điểm đón",
-          destination: booking.location_to_name || "Điểm đến",
-          fare: parseInt(booking.total_price || "0"),
-          date: new Date(booking.created_at).toLocaleDateString("vi-VN"),
-          status: "completed" as const,
-          distance: parseFloat(booking.distance || "0"),
-        }))
-    : [];
-
-  const parseCoordinates = (locationString: string): [number, number] => {
-    try {
-      const coords = JSON.parse(locationString);
-      return [coords[0], coords[1]];
-    } catch (error) {
-      console.error("Error parsing coordinates:", error);
-      return [0, 0];
-    }
-  };
-
-  const calculateEstimatedTime = (distance: string): string => {
-    const distanceNum = parseFloat(distance);
-    const timeInMinutes = Math.round(distanceNum * 3);
-    return `${timeInMinutes} phút`;
-  };
-
-  const convertBookingToTripRequest = (booking: any): TripRequest => {
-    return {
-      id: booking.id.toString(),
-      passenger: {
         name: `Khách hàng #${booking.id_user}`, 
         rating: 4.5,
         phone: "0909123456", 
@@ -299,16 +229,10 @@ export default function HomeDriver() {
     }).format(price);
   };
 
-  const handleAcceptTrip = async (trip: TripRequest) => {
-    try {
-      const res = await postApproveBooking(trip.id, driverInfo.user.id);
-      if (res.status === 200) {
-        setCurrentTrip(trip);
-        setTripStatus("going_to_pickup");
-      } else if (res.status === 201) {
-        alert("Đã có tài xế nhận cuốc");
-      }
-    } catch (error) {}
+  const handleAcceptTrip = (trip: TripRequest) => {
+    setCurrentTrip(trip);
+    setTripStatus("going_to_pickup");
+
   };
 
   const handleRejectTrip = (tripId: string) => {
@@ -793,9 +717,7 @@ export default function HomeDriver() {
                       <p className="text-2xl font-bold text-gray-900">
                         {completedTrips.length}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        Chuyến đã hoàn thành
-                      </p>
+                      <p className="text-sm text-gray-600">Chuyến đã hoàn thành</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-gray-900">
