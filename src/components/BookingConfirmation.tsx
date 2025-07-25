@@ -70,16 +70,13 @@ export default function BookingConfirmation({
   >("searching");
   const [estimatedTime, setEstimatedTime] = useState(5);
 
-  // Get current booking data
   const currentBooking: BookingData | null = bookingUser?.[0] || null;
 
   useEffect(() => {
     if (!userInfo?.user?.id) return;
 
-    // Fetch initial booking data
     handleGetBookingUser(userInfo.user.id);
 
-    // Subscribe to changes in the "booking" table
     const channel = supabase
       .channel("booking-changes")
       .on(
@@ -88,12 +85,11 @@ export default function BookingConfirmation({
           event: "*",
           schema: "public",
           table: "booking",
-          filter: `id_user=eq.${userInfo.user.id}`, // Filter for the logged-in user
+          filter: `id_user=eq.${userInfo.user.id}`,
         },
         (payload: any) => {
           console.log("Realtime payload:", payload);
 
-          // Ensure we are modifying the correct state (handling INSERT, UPDATE, DELETE)
           // setBookingUser((prev: any[]) => {
           //   // Handle INSERT
           //   if (payload.eventType === "INSERT") {

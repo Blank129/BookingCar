@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       } else {
         console.error("Đăng nhập thất bại:", data);
-        alert(data?.error || "Đăng nhập thất bại");
+        // alert(data?.error || "Đăng nhập thất bại");
       }
     } catch (error) {
       console.error("Lỗi fetch tới backend:", error);

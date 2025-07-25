@@ -156,3 +156,16 @@ export const getBookingCars = async (id_user: any) => {
     return error;
   }
 };
+
+export const getProfileUser = async (id_user: any) => {
+  try {
+    const response: any = await axiosApiUserInstance.get(
+      `/profile/${id_user}`
+    );
+
+    return response;
+  } catch (error) {
+    console.log("lỗi getProfileUser", error);
+    return error;
+  }
+};

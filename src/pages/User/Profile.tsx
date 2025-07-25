@@ -155,15 +155,6 @@ const ProfilePage = () => {
                   </p>
                   <p className="text-sm text-gray-600">Chuyến đi</p>
                 </div>
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="flex items-center justify-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <p className="text-2xl font-bold text-green-600">
-                      {userData.averageRating}
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-600">Đánh giá</p>
-                </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <p className="text-lg font-bold text-purple-600">
                     {formatPrice(userData.totalSpent)}
