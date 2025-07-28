@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User,
   Edit3,
@@ -19,13 +19,24 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
+import { CarContext } from "../../context/carContext";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { userInfo, setUserInfo, handlePostDecodeToken } = AuthContext();
+  const { profileUser, handleGetProfileUser, handleUpdateProfileUser } = CarContext();
   const [activeTab, setActiveTab] = useState<
     "profile" | "history" | "settings"
   >("profile");
   const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    avatar: ""
+  });
 
   // Static user data
   const userData = {
@@ -41,7 +52,6 @@ const ProfilePage = () => {
     averageRating: 4.8,
   };
 
-  // Static trip history
   const tripHistory = [
     {
       id: "1",
@@ -95,11 +105,94 @@ const ProfilePage = () => {
     },
   ];
 
+  useEffect(() => {
+    if (userInfo) {
+      handleGetProfileUser(userInfo.user.id);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("userInfoWeb");
+    if (token) {
+      handlePostDecodeToken(token);
+    } else {
+      setUserInfo(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profileUser) {
+      setEditedProfile({
+        name: profileUser.name || "",
+        phone: profileUser.phone || "",
+        email: profileUser.email || "",
+        address: profileUser.address || "",
+        avatar: profileUser.avatar || ""
+      });
+    }
+  }, [profileUser]);
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setEditedProfile(prev => ({
+          ...prev,
+          avatar: result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async () => {
+    console.log("Thông tin đã lưu:", {
+      name: editedProfile.name,
+      phone: editedProfile.phone,
+      email: editedProfile.email,
+      avatar: editedProfile.avatar
+    });
+    
+    await handleUpdateProfileUser(userInfo.user.id, editedProfile.name, editedProfile.phone, editedProfile.email, editedProfile.avatar);
+    
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedProfile({
+      name: profileUser.name || "",
+      phone: profileUser.phone || "",
+      email: profileUser.email || "",
+      address: profileUser.address || "",
+      avatar: profileUser.avatar || ""
+    });
+    setIsEditing(false);
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
+  };
+
+  const formatToVietnamTime = (utcDateString: any) => {
+    const utcDate = new Date(utcDateString);
+
+    const vietnamOffsetMs = 7 * 60 * 60 * 1000;
+    const vietnamDate = new Date(utcDate.getTime() + vietnamOffsetMs);
+
+    const day = vietnamDate.getDate().toString().padStart(2, "0");
+    const month = (vietnamDate.getMonth() + 1).toString().padStart(2, "0"); // Tháng bắt đầu từ 0
+    const year = vietnamDate.getFullYear();
+
+    const hours = vietnamDate.getHours().toString().padStart(2, "0");
+    const minutes = vietnamDate.getMinutes().toString().padStart(2, "0");
+    const seconds = vietnamDate.getSeconds().toString().padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   };
 
   return (
@@ -132,32 +225,46 @@ const ProfilePage = () => {
               <div className="text-center">
                 <div className="relative inline-block">
                   <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 mx-auto">
-                    <img
-                      src={userData.avatar}
-                      alt={userData.name}
+                   <img
+                      src={editedProfile.avatar || profileUser.avatar}
+                      alt={editedProfile.name || profileUser.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <button className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
-                    <Camera className="w-4 h-4" />
-                  </button>
+                  {isEditing && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                        id="avatar-upload"
+                      />
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors cursor-pointer"
+                      >
+                        <Camera className="w-4 h-4" />
+                      </label>
+                    </>
+                  )}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mt-4">
-                  {userData.name}
+                  {editedProfile.name || profileUser.name}
                 </h2>
-                <p className="text-gray-600">{userData.email}</p>
+                <p className="text-gray-600">{editedProfile.email || profileUser.email}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <p className="text-2xl font-bold text-blue-600">
-                    {userData.totalTrips}
+                    {profileUser.totalTrips}
                   </p>
                   <p className="text-sm text-gray-600">Chuyến đi</p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <p className="text-lg font-bold text-purple-600">
-                    {formatPrice(userData.totalSpent)}
+                    {formatPrice(profileUser.totalSpent)}
                   </p>
                   <p className="text-sm text-gray-600">Tổng chi tiêu</p>
                 </div>
@@ -220,14 +327,14 @@ const ProfilePage = () => {
                     ) : (
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => setIsEditing(false)}
+                          onClick={handleSave}
                           className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
                           <Save className="w-4 h-4" />
                           <span>Lưu</span>
                         </button>
                         <button
-                          onClick={() => setIsEditing(false)}
+                          onClick={handleCancel}
                           className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                         >
                           <X className="w-4 h-4" />
@@ -246,13 +353,17 @@ const ProfilePage = () => {
                         {isEditing ? (
                           <input
                             type="text"
-                            defaultValue={userData.name}
+                            value={editedProfile.name}
+                            onChange={(e) => setEditedProfile(prev => ({
+                              ...prev,
+                              name: e.target.value
+                            }))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         ) : (
                           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                             <User className="w-5 h-5 text-gray-400" />
-                            <span>{userData.name}</span>
+                            <span>{profileUser.name}</span>
                           </div>
                         )}
                       </div>
@@ -263,7 +374,7 @@ const ProfilePage = () => {
                         </label>
                         <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                           <Mail className="w-5 h-5 text-gray-400" />
-                          <span>{userData.email}</span>
+                          <span>{profileUser.email}</span>
                         </div>
                       </div>
 
@@ -274,13 +385,17 @@ const ProfilePage = () => {
                         {isEditing ? (
                           <input
                             type="tel"
-                            defaultValue={userData.phone}
+                           value={editedProfile.phone}
+                            onChange={(e) => setEditedProfile(prev => ({
+                              ...prev,
+                              phone: e.target.value
+                            }))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         ) : (
                           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                             <Phone className="w-5 h-5 text-gray-400" />
-                            <span>{userData.phone}</span>
+                            <span>{profileUser.phone}</span>
                           </div>
                         )}
                       </div>
@@ -291,7 +406,9 @@ const ProfilePage = () => {
                         </label>
                         <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                           <Calendar className="w-5 h-5 text-gray-400" />
-                          <span>{userData.joinDate}</span>
+                          <span>
+                            {formatToVietnamTime(profileUser.created_at)}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -302,14 +419,18 @@ const ProfilePage = () => {
                       </label>
                       {isEditing ? (
                         <textarea
-                          defaultValue={userData.address}
+                        value={editedProfile.address}
+                          onChange={(e) => setEditedProfile(prev => ({
+                            ...prev,
+                            address: e.target.value
+                          }))}
                           rows={3}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       ) : (
                         <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                           <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                          <span>{userData.address}</span>
+                          <span>{profileUser.address}</span>
                         </div>
                       )}
                     </div>
@@ -321,7 +442,7 @@ const ProfilePage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="text-center">
                           <p className="text-3xl font-bold text-blue-600">
-                            {userData.totalTrips}
+                            {profileUser.totalTrips}
                           </p>
                           <p className="text-sm text-gray-600">
                             Tổng chuyến đi
@@ -329,7 +450,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="text-center">
                           <p className="text-3xl font-bold text-green-600">
-                            {formatPrice(userData.totalSpent)}
+                            {formatPrice(profileUser.totalSpent)}
                           </p>
                           <p className="text-sm text-gray-600">Tổng chi tiêu</p>
                         </div>
@@ -337,7 +458,7 @@ const ProfilePage = () => {
                           <div className="flex items-center justify-center space-x-1">
                             <Star className="w-6 h-6 text-yellow-400 fill-current" />
                             <p className="text-3xl font-bold text-yellow-600">
-                              {userData.averageRating}
+                              {profileUser.averageRating}
                             </p>
                           </div>
                           <p className="text-sm text-gray-600">

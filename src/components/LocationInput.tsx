@@ -25,7 +25,6 @@ export default function LocationInput({ value, placeholder, onLocationSelect, ty
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch search results from OpenStreetMap
   useEffect(() => {
     if (query.trim() === '') {
       setSuggestions(recentLocations);
@@ -60,7 +59,6 @@ export default function LocationInput({ value, placeholder, onLocationSelect, ty
     };
   }, [query, recentLocations]);
 
-  // Ẩn suggestions khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -82,7 +80,6 @@ export default function LocationInput({ value, placeholder, onLocationSelect, ty
     setQuery('');
     setShowSuggestions(false);
 
-    // Lưu vào danh sách gần đây
     setRecentLocations(prev => {
       const updated = [location, ...prev.filter(l => l.id !== location.id)].slice(0, 5);
       return updated;

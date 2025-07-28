@@ -159,13 +159,36 @@ export const getBookingCars = async (id_user: any) => {
 
 export const getProfileUser = async (id_user: any) => {
   try {
-    const response: any = await axiosApiUserInstance.get(
-      `/profile/${id_user}`
-    );
+    const response: any = await axiosApiUserInstance.get(`/profile/${id_user}`);
 
     return response;
   } catch (error) {
     console.log("lỗi getProfileUser", error);
+    return error;
+  }
+};
+
+export const putProfileUser = async (
+  id_user: any,
+  name: any,
+  phone: any,
+  email: any,
+  avatar: any
+) => {
+  try {
+    const response: any = await axiosApiUserInstance.put(
+      `/profile/${id_user}`,
+      {
+        name,
+        phone,
+        email,
+        avatar,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.log("lỗi putProfileUser", error);
     return error;
   }
 };

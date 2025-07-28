@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from "react";
 import { getBookings, getCars } from "../service/apiDriver";
-import { getBookingCars, getProfileUser } from "../service/apiUser";
+import { getBookingCars, getProfileUser, putProfileUser } from "../service/apiUser";
 
 type CarContextType = {
   cars: any[];
@@ -11,6 +11,7 @@ type CarContextType = {
   handleGetBookingUser: any;
   profileUser: any;
   handleGetProfileUser: any;
+  handleUpdateProfileUser: any;
 };
 
 const CarContexts = createContext<CarContextType | undefined>(undefined);
@@ -66,6 +67,17 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  const handleUpdateProfileUser = async (id_user: any, name: string, phone: string, email: string, avatar: string) => {
+    try {
+      const res = await putProfileUser(id_user, name, phone, email, avatar);
+      if (res.status === 200) {
+        handleGetProfileUser(id_user);
+      }
+    } catch (error) {
+      console.error("Lỗi cập nhật thông tin người dùng:", error);
+    }
+  }
+
   useEffect(() => {
     handleGetAllCars();
   },[])
@@ -80,7 +92,8 @@ export const CarProvider: React.FC<{ children: ReactNode }> = ({
         setBookingUser,
         handleGetBookingUser,
         profileUser,
-        handleGetProfileUser
+        handleGetProfileUser,
+        handleUpdateProfileUser
       }}
     >
       {children}
