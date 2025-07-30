@@ -88,7 +88,7 @@ export default function BookingConfirmation({
           filter: `id_user=eq.${userInfo.user.id}`,
         },
         (payload: any) => {
-          console.log("Realtime payload:", payload);
+          // console.log("Realtime payload:", payload);
 
           // setBookingUser((prev: any[]) => {
           //   // Handle INSERT
@@ -157,8 +157,8 @@ export default function BookingConfirmation({
     }
   }, [status, estimatedTime]);
 
-  console.log("bookingUser", bookingUser);
-  console.log("currentBooking", currentBooking);
+  // console.log("bookingUser", bookingUser);
+  // console.log("currentBooking", currentBooking);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {

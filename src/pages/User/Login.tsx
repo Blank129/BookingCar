@@ -85,7 +85,7 @@ const LoginPage = () => {
   }, []);
 
   const handleGoogleLogin = () => {
-    console.log("🔘 Bắt đầu đăng nhập với Google");
+    console.log("Bắt đầu đăng nhập với Google");
 
     if (window.google && window.google.accounts && window.google.accounts.id) {
       window.google.accounts.id.prompt();

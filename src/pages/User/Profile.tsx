@@ -148,12 +148,12 @@ const ProfilePage = () => {
   };
 
   const handleSave = async () => {
-    console.log("Thông tin đã lưu:", {
-      name: editedProfile.name,
-      phone: editedProfile.phone,
-      email: editedProfile.email,
-      avatar: editedProfile.avatar
-    });
+    // console.log("Thông tin đã lưu:", {
+    //   name: editedProfile.name,
+    //   phone: editedProfile.phone,
+    //   email: editedProfile.email,
+    //   avatar: editedProfile.avatar
+    // });
     
     await handleUpdateProfileUser(userInfo.user.id, editedProfile.name, editedProfile.phone, editedProfile.email, editedProfile.avatar);
     

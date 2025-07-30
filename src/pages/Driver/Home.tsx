@@ -72,7 +72,7 @@ export default function HomeDriver() {
     month: 12500000,
   });
 
-  console.log("driverInfo", listBookings);
+  // console.log("driverInfo", listBookings);
 
   useEffect(() => {
     const driverToken = localStorage.getItem("driverInfo");
@@ -98,7 +98,7 @@ export default function HomeDriver() {
             filter: `id_type_car=eq.${driverInfo.user.id_type_car}`,
           },
           (payload) => {
-            console.log("Realtime event:", payload);
+            // console.log("Realtime event:", payload);
             handleGetListBooking(driverInfo.user.id_type_car);
           }
         )

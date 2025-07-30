@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           navigate("/");
         }
       } else {
-        console.log("res else", res);
+        // console.log("res else", res);
         alert(res);
       }
     } catch (error) {
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         localStorage.setItem("driverInfo", res.data.token);
         navigate("/driver/dashboard");
       } else {
-        console.log("res else", res);
+        // console.log("res else", res);
         alert(res);
       }
     } catch (error) {
