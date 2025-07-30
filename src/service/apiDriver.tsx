@@ -69,3 +69,43 @@ export const postApproveBooking = async (id_booking: any, id_driver: any) => {
     return error.response.data.error;
   }
 };
+
+export const postSecondStatusBooking = async (id_booking: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.post(`/status-second/${id_booking}`);
+    return response;
+  } catch (error) {
+    console.log("lỗi postSecondStatusBooking", error);
+    return error;
+  }
+};
+
+export const postThirdStatusBooking = async (id_booking: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.post(`/status-third/${id_booking}`);
+    return response;
+  } catch (error) {
+    console.log("lỗi postThirdStatusBooking", error);
+    return error;
+  }
+};
+
+export const postFourthStatusBooking = async (id_booking: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.post(`/status-fourth/${id_booking}`);
+    return response;
+  } catch (error) {
+    console.log("lỗi postFourthStatusBooking", error);
+    return error;
+  }
+};
+
+export const postFifthStatusBooking = async (id_booking: any) => {
+  try {
+    const response: any = await axiosApiDriverInstance.post(`/status-fifth/${id_booking}`);
+    return response;
+  } catch (error) {
+    console.log("lỗi postFifthStatusBooking", error);
+    return error;
+  }
+};

@@ -16,6 +16,10 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import {
   postApproveBooking,
+  postFifthStatusBooking,
+  postFourthStatusBooking,
+  postSecondStatusBooking,
+  postThirdStatusBooking,
   updateOnlineStatus,
 } from "../../service/apiDriver";
 import { CarContext } from "../../context/carContext";
@@ -257,12 +261,18 @@ export default function HomeDriver() {
 
     switch (tripStatus) {
       case "going_to_pickup":
+        postSecondStatusBooking(currentTrip.id);
         setTripStatus("arrived_pickup");
         break;
       case "arrived_pickup":
+        postThirdStatusBooking(currentTrip.id);
+        setTimeout(() => {
+          postFourthStatusBooking(currentTrip.id);
+        }, 2000);
         setTripStatus("passenger_onboard");
         break;
       case "passenger_onboard":
+        postFifthStatusBooking(currentTrip.id);
         setTripStatus("completed");
         setEarnings((prev) => ({
           ...prev,
