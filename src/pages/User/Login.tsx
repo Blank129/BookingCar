@@ -64,15 +64,20 @@ const LoginPage = () => {
         })
         .then((res) => {
           console.log("Access token:", res.data.access_token);
+
           axios
-            .get("https://graph.zalo.me/v2.0/me?fields=id,name,picture", {
-              headers: {
-                Authorization: `Bearer ${res.data.access_token}`,
-              },
-            })
+            .get(
+              `http://localhost:5000/zalo/me?access_token=${res.data.access_token}`
+            )
             .then((res) => {
-              console.log("Thông tin người dùng:", res.data);
-              // Lưu vào context / Redux / UI...
+              console.log("Thông tin người dùng từ backend:", res.data);
+              // Lưu user info vào Context / Redux
+            })
+            .catch((err) => {
+              console.error(
+                "Lỗi lấy thông tin người dùng:",
+                err.response?.data || err.message
+              );
             });
           navigate("/"); // Chuyển về trang chính
         })
