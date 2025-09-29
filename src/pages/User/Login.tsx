@@ -44,7 +44,7 @@ const LoginPage = () => {
         try {
             const res = await axios.get('http://localhost:5000/login');
             console.log("res", res)
-            // window.location.href = res.data.url;
+            window.location.href = res.data.url;
         } catch (error) {
             console.error('Lỗi khi lấy URL đăng nhập Zalo:', error);
         }
