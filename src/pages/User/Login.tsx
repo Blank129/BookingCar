@@ -42,7 +42,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/login');
+            const res = await axios.get('http://localhost:5000/zalo/login');
             console.log("res", res)
             window.location.href = res.data.url;
         } catch (error) {
@@ -57,7 +57,7 @@ const LoginPage = () => {
 
     if (code && state) {
       // Gọi backend để lấy access token
-      axios.post('http://localhost:5000/exchange-token', {
+      axios.post('http://localhost:5000/zalo/exchange-token', {
         code,
         state
       })
