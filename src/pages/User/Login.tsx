@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import axios from "axios";
 
 declare global {
   interface Window {
@@ -39,9 +40,15 @@ const LoginPage = () => {
 
   const loginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${appId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&state=${state}`;
 
-  const handleLogin = () => {
-    window.location.href = loginUrl;
-  };
+  const handleLogin = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/login');
+            console.log("res", res)
+            window.location.href = res.data.url;
+        } catch (error) {
+            console.error('Lỗi khi lấy URL đăng nhập Zalo:', error);
+        }
+    };
 
   const handleInputChange = (e: any) => {
     setFormData({
