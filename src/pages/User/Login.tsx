@@ -50,6 +50,28 @@ const LoginPage = () => {
         }
     };
 
+    useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    if (code && state) {
+      // Gọi backend để lấy access token
+      axios.post('http://localhost:5000/exchange-token', {
+        code,
+        state
+      })
+      .then((res) => {
+        console.log('Access token:', res.data.access_token);
+        // Lưu token vào localStorage / context...
+        navigate('/'); // Chuyển về trang chính
+      })
+      .catch((err) => {
+        console.error('Lỗi xác thực Zalo:', err.response?.data || err.message);
+      });
+    }
+  }, [location]);
+
   const handleInputChange = (e: any) => {
     setFormData({
       ...formData,
