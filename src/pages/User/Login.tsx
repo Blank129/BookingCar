@@ -32,17 +32,9 @@ const LoginPage = () => {
     phone: "",
     confirmPassword: "",
   });
-
-  const appId = "3220276737888942740";
-  const redirectUri = "https://booking-car-one.vercel.app/login";
-  const state = "random_state_string"; // Chống CSRF
-  const codeChallenge = "YcSRKWXnm4OAeE5p22LNKDmgmMDUK6Qq_Nr8fCb7KsQ"; // Được tạo từ code_verifier
-
-  const loginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${appId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&state=${state}`;
-
   const handleLogin = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/zalo/login");
+      const res = await axios.get("https://booking-car-be.vercel.app/zalo/login");
       console.log("res", res);
       window.location.href = res.data.url;
     } catch (error) {
@@ -58,7 +50,7 @@ const LoginPage = () => {
     if (code && state) {
       // Gọi backend để lấy access token
       axios
-        .post("http://localhost:5000/zalo/exchange-token", {
+        .post("https://booking-car-be.vercel.app/zalo/exchange-token", {
           code,
           state,
         })
@@ -67,7 +59,7 @@ const LoginPage = () => {
 
           axios
             .get(
-              `http://localhost:5000/zalo/me?access_token=${res.data.access_token}`
+              `https://booking-car-be.vercel.app/zalo/me?access_token=${res.data.access_token}`
             )
             .then((res) => {
               console.log("Thông tin người dùng từ backend:", res.data);
