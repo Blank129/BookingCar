@@ -32,7 +32,7 @@ const LoginPage = () => {
   });
 
   const appId = '3220276737888942740';
-  const redirectUri = 'https://booking-car-one.vercel.app';
+  const redirectUri = 'https://booking-car-one.vercel.app/login';
   const state = 'random_state_string'; // Chống CSRF
   const codeChallenge = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Được tạo từ code_verifier
 
