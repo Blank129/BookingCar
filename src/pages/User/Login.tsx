@@ -35,7 +35,7 @@ const LoginPage = () => {
   const appId = '3220276737888942740';
   const redirectUri = 'https://booking-car-one.vercel.app/login';
   const state = 'random_state_string'; // Chống CSRF
-  const codeChallenge = 'dF6P3H_yDKBJVB_Tzp-6RFLWrGrZ-3-rdogBJmxzBD4'; // Được tạo từ code_verifier
+  const codeChallenge = 'YcSRKWXnm4OAeE5p22LNKDmgmMDUK6Qq_Nr8fCb7KsQ'; // Được tạo từ code_verifier
 
   const loginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${appId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&state=${state}`;
 
