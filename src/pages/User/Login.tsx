@@ -33,42 +33,55 @@ const LoginPage = () => {
     confirmPassword: "",
   });
 
-  const appId = '3220276737888942740';
-  const redirectUri = 'https://booking-car-one.vercel.app/login';
-  const state = 'random_state_string'; // Chống CSRF
-  const codeChallenge = 'YcSRKWXnm4OAeE5p22LNKDmgmMDUK6Qq_Nr8fCb7KsQ'; // Được tạo từ code_verifier
+  const appId = "3220276737888942740";
+  const redirectUri = "https://booking-car-one.vercel.app/login";
+  const state = "random_state_string"; // Chống CSRF
+  const codeChallenge = "YcSRKWXnm4OAeE5p22LNKDmgmMDUK6Qq_Nr8fCb7KsQ"; // Được tạo từ code_verifier
 
   const loginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${appId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&state=${state}`;
 
   const handleLogin = async () => {
-        try {
-            const res = await axios.get('http://localhost:5000/zalo/login');
-            console.log("res", res)
-            window.location.href = res.data.url;
-        } catch (error) {
-            console.error('Lỗi khi lấy URL đăng nhập Zalo:', error);
-        }
-    };
+    try {
+      const res = await axios.get("http://localhost:5000/zalo/login");
+      console.log("res", res);
+      window.location.href = res.data.url;
+    } catch (error) {
+      console.error("Lỗi khi lấy URL đăng nhập Zalo:", error);
+    }
+  };
 
-    useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const code = params.get('code');
-    const state = params.get('state');
+    const code = params.get("code");
+    const state = params.get("state");
 
     if (code && state) {
       // Gọi backend để lấy access token
-      axios.post('http://localhost:5000/zalo/exchange-token', {
-        code,
-        state
-      })
-      .then((res) => {
-        console.log('Access token:', res.data.access_token);
-        // Lưu token vào localStorage / context...
-        navigate('/'); // Chuyển về trang chính
-      })
-      .catch((err) => {
-        console.error('Lỗi xác thực Zalo:', err.response?.data || err.message);
-      });
+      axios
+        .post("http://localhost:5000/zalo/exchange-token", {
+          code,
+          state,
+        })
+        .then((res) => {
+          console.log("Access token:", res.data.access_token);
+          axios
+            .get("https://graph.zalo.me/v2.0/me?fields=id,name,picture", {
+              headers: {
+                Authorization: `Bearer ${res.data.access_token}`,
+              },
+            })
+            .then((res) => {
+              console.log("Thông tin người dùng:", res.data);
+              // Lưu vào context / Redux / UI...
+            });
+          navigate("/"); // Chuyển về trang chính
+        })
+        .catch((err) => {
+          console.error(
+            "Lỗi xác thực Zalo:",
+            err.response?.data || err.message
+          );
+        });
     }
   }, [location]);
 
@@ -138,18 +151,18 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setIsLoading(true); 
+    setIsLoading(true);
 
     try {
       if (isLogin) {
-        await handlePostLoginWeb(formData.email, formData.password, 'user');
+        await handlePostLoginWeb(formData.email, formData.password, "user");
       } else {
         await handlePostRegisterWeb(
           formData.name,
           formData.phone,
           formData.email,
           formData.password,
-          'user'
+          "user"
         );
         setIsLogin(true);
         setFormData({
@@ -415,7 +428,7 @@ const LoginPage = () => {
           {/* Driver login link */}
           <div className="text-center mt-4">
             <button
-              onClick={() => navigate('/driver/login')}
+              onClick={() => navigate("/driver/login")}
               className="text-green-500 hover:text-green-600 text-sm font-medium"
             >
               Đăng nhập với tài khoản tài xế
