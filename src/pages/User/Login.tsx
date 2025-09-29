@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+
 declare global {
   interface Window {
     google: any;
@@ -34,7 +35,7 @@ const LoginPage = () => {
   const appId = '3220276737888942740';
   const redirectUri = 'https://booking-car-one.vercel.app/login';
   const state = 'random_state_string'; // Chống CSRF
-  const codeChallenge = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // Được tạo từ code_verifier
+  const codeChallenge = 'dF6P3H_yDKBJVB_Tzp-6RFLWrGrZ-3-rdogBJmxzBD4'; // Được tạo từ code_verifier
 
   const loginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${appId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&state=${state}`;
 
