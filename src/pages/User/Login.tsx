@@ -32,6 +32,8 @@ const LoginPage = () => {
     phone: "",
     confirmPassword: "",
   });
+
+  const [zalo, setZalo] = useState({});
   const handleLogin = async () => {
     try {
       const res = await axios.get("https://booking-car-be.vercel.app/zalo/login");
@@ -63,6 +65,7 @@ const LoginPage = () => {
             )
             .then((res) => {
               console.log("Thông tin người dùng từ backend:", res.data);
+              setZalo(res.data.id);
               // Lưu user info vào Context / Redux
             })
             .catch((err) => {
@@ -71,7 +74,7 @@ const LoginPage = () => {
                 err.response?.data || err.message
               );
             });
-          navigate("/"); // Chuyển về trang chính
+          // navigate("/");
         })
         .catch((err) => {
           console.error(
@@ -432,6 +435,7 @@ const LoginPage = () => {
             </button>
           </div>
           <button onClick={handleLogin}>Đăng nhập bằng Zalo</button>
+          {zalo && <div>ID Zalo: {JSON.stringify(zalo)}</div>}
 
           {/* Terms */}
           <p className="text-center text-xs text-gray-500 mt-6">
