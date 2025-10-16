@@ -431,7 +431,7 @@ const LoginPage = () => {
               Đăng nhập với tài khoản tài xế
             </button>
           </div>
-          {/* <button onClick={handleLogin}>Đăng nhập bằng Zalo</button> */}
+          <button onClick={handleLogin}>Đăng nhập bằng Zalo</button>
 
           {/* Terms */}
           <p className="text-center text-xs text-gray-500 mt-6">
